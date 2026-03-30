@@ -8,7 +8,7 @@ import { sendResultEmail } from './services/api'
 
 // Import questions and careers directly from the data folder
 import questions from "./questions.json"; 
-import careersData from '../../../data/careers.json'
+import careersData from './careers.json'
 
 function App() {
   // State for the whole app
