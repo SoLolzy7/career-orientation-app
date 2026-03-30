@@ -1,101 +1,182 @@
-import { useState, useEffect } from 'react'
-import PersonalInfoForm from './components/PersonalInfoForm'
-import QuestionCard from './components/QuestionCard'
-import CareerResults from './components/CareerResults'
-import LoadingSpinner from './components/LoadingSpinner'
-import { calculatePersonality } from './services/scoring'
-import { sendResultEmail } from './services/api'
-
-// Import questions and careers directly from the data folder
-import questions from "./questions.json"; 
-import careersData from './careers.json'
+import { useState, useEffect } from 'react';
+import PersonalInfoForm from './components/PersonalInfoForm';
+import QuestionCard from './components/QuestionCard';
+import CareerResults from './components/CareerResults';
+import LoadingSpinner from './components/LoadingSpinner';
+import { calculatePersonality } from './services/scoring';
+import { sendResultEmail } from './services/api';
 
 function App() {
-  // State for the whole app
-  const [step, setStep] = useState('personal') // 'personal', 'questions', 'results'
-  const [userInfo, setUserInfo] = useState({ name: '', email: '' })
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
-  const [answers, setAnswers] = useState([]) // store answers as { questionId, value }
-  const [personality, setPersonality] = useState('')
-  const [careers, setCareers] = useState([])
-  const [loading, setLoading] = useState(false)
+  const [step, setStep] = useState('personal');
+  const [userInfo, setUserInfo] = useState({ name: '', email: '' });
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [answers, setAnswers] = useState([]);
+  const [result, setResult] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [toast, setToast] = useState(null);
+  const [questionsData, setQuestionsData] = useState([]);
+  const [careersData, setCareersData] = useState({});
+  const [dataLoaded, setDataLoaded] = useState(false);
 
-  // When all questions are answered, calculate results
+  // Load dữ liệu khi component mount
   useEffect(() => {
-    if (step === 'questions' && answers.length === questionsData.length) {
-      const result = calculatePersonality(answers, questionsData)
-      setPersonality(result.type)
-      setCareers(careersData[result.type] || ['No specific careers found'])
-      setStep('results')
+    const loadData = async () => {
+      try {
+        console.log('Đang tải dữ liệu...');
+        const questionsRes = await fetch('/questions.json');
+        const careersRes = await fetch('/careers.json');
+        
+        if (!questionsRes.ok) {
+          throw new Error(`Không thể tải questions.json: ${questionsRes.status}`);
+        }
+        if (!careersRes.ok) {
+          throw new Error(`Không thể tải careers.json: ${careersRes.status}`);
+        }
+        
+        const questions = await questionsRes.json();
+        const careers = await careersRes.json();
+        
+        console.log('Đã tải xong:', questions.length, 'câu hỏi');
+        setQuestionsData(questions);
+        setCareersData(careers);
+        setDataLoaded(true);
+      } catch (error) {
+        console.error('Lỗi chi tiết:', error);
+        alert('Không thể tải dữ liệu: ' + error.message);
+      }
+    };
+    
+    loadData();
+  }, []);
+
+  const showToast = (message, type = 'success') => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 3000);
+  };
+
+  // Tính toán kết quả khi hoàn thành câu hỏi
+  useEffect(() => {
+    if (step === 'questions' && answers.length === questionsData.length && questionsData.length > 0) {
+      setLoading(true);
+      setTimeout(() => {
+        const personalityResult = calculatePersonality(answers, questionsData);
+        const careerData = careersData[personalityResult.type];
+        setResult({
+          ...personalityResult,
+          careers: careerData || { description: 'Chưa có dữ liệu', careers: [] }
+        });
+        setStep('results');
+        setLoading(false);
+      }, 500);
     }
-  }, [answers, step])
+  }, [answers, step, questionsData, careersData]);
 
-  // Save user info and start questions
   const handlePersonalInfoSubmit = (info) => {
-    setUserInfo(info)
-    setStep('questions')
-  }
+    setUserInfo(info);
+    setStep('questions');
+  };
 
-  // Save answer and move to next question
   const handleAnswer = (answerValue) => {
     const newAnswer = {
       questionId: questionsData[currentQuestionIndex].id,
       value: answerValue
-    }
-    setAnswers([...answers, newAnswer])
+    };
+    setAnswers([...answers, newAnswer]);
 
-    // Move to next question
     if (currentQuestionIndex + 1 < questionsData.length) {
-      setCurrentQuestionIndex(currentQuestionIndex + 1)
-    } else {
-      // All questions answered – the useEffect will handle calculation
+      setCurrentQuestionIndex(currentQuestionIndex + 1);
     }
-  }
+  };
 
-  // Send email after results are shown
   const handleSendEmail = async () => {
-    setLoading(true)
+    if (!result) return;
+    
+    setLoading(true);
     try {
-      await sendResultEmail(userInfo.email, userInfo.name, personality, careers)
-      alert('Email sent successfully!')
+      // Lấy danh sách careers
+      let careerTitles = [];
+      if (result.careers.careers) {
+        careerTitles = result.careers.careers.map(c => c.title || c);
+      } else if (Array.isArray(result.careers)) {
+        careerTitles = result.careers;
+      }
+      
+      await sendResultEmail(
+        userInfo.email,
+        userInfo.name,
+        result.type,
+        careerTitles
+      );
+      showToast('Email đã được gửi thành công! 📧', 'success');
     } catch (error) {
-      console.error(error)
-      alert('Failed to send email. Please try again.')
+      console.error(error);
+      showToast('Gửi email thất bại. Vui lòng thử lại! ❌', 'error');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
+  };
+
+  const handleRestart = () => {
+    setStep('personal');
+    setCurrentQuestionIndex(0);
+    setAnswers([]);
+    setResult(null);
+  };
+
+  // Hiển thị loading khi chưa có dữ liệu
+  if (!dataLoaded) {
+    return (
+      <div className="container">
+        <div className="card" style={{ textAlign: 'center' }}>
+          <LoadingSpinner />
+          <p>Đang tải dữ liệu...</p>
+        </div>
+      </div>
+    );
   }
 
-  // Render different screens
   if (step === 'personal') {
-    return <PersonalInfoForm onSubmit={handlePersonalInfoSubmit} />
+    return <PersonalInfoForm onSubmit={handlePersonalInfoSubmit} />;
   }
 
   if (step === 'questions') {
-    const currentQuestion = questionsData[currentQuestionIndex]
+    const currentQuestion = questionsData[currentQuestionIndex];
     return (
       <QuestionCard
         question={currentQuestion.text}
         options={currentQuestion.options}
         onAnswer={handleAnswer}
-        progress={`${currentQuestionIndex + 1} / ${questionsData.length}`}
+        currentIndex={currentQuestionIndex}
+        total={questionsData.length}
       />
-    )
+    );
   }
 
   if (step === 'results') {
+    if (loading || !result) return <LoadingSpinner />;
+    
     return (
-      <CareerResults
-        name={userInfo.name}
-        personality={personality}
-        careers={careers}
-        onSendEmail={handleSendEmail}
-        loading={loading}
-      />
-    )
+      <>
+        <CareerResults
+          name={userInfo.name}
+          personality={result.type}
+          careers={result.careers}
+          percentages={result.percentages}
+          onSendEmail={handleSendEmail}
+          onRestart={handleRestart}
+          loading={loading}
+        />
+        {toast && (
+          <div className={`toast toast-${toast.type}`}>
+            <span>{toast.type === 'success' ? '✅' : '❌'}</span>
+            <span>{toast.message}</span>
+          </div>
+        )}
+      </>
+    );
   }
 
-  return <LoadingSpinner />
+  return <LoadingSpinner />;
 }
 
-export default App
+export default App;
