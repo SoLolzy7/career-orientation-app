@@ -2,141 +2,141 @@
   {
     "id": 1,
     "group": "EI",
-    "text": "Tôi cảm thấy tràn đầy năng lượng khi làm việc trong nhóm lớn.",
-    "description": "I feel more energized when working in a large group.",
+    "text": "I feel more energized when working in a large group.",
+    "description": "Rate how well this describes you (1 = Not at all, 5 = Describes me very well)",
     "direction": "E"
   },
   {
     "id": 2,
     "group": "EI",
-    "text": "Tôi thường là người bắt đầu cuộc trò chuyện khi gặp người mới.",
-    "description": "I am usually the one to initiate conversations in new encounters.",
+    "text": "I am usually the one to initiate conversations in new encounters.",
+    "description": "Rate how well this describes you (1 = Not at all, 5 = Describes me very well)",
     "direction": "E"
   },
   {
     "id": 3,
     "group": "EI",
-    "text": "Sau một sự kiện xã hội kéo dài, tôi cảm thấy tràn đầy năng lượng thay vì kiệt sức.",
-    "description": "After a long social event, I feel full of energy rather than exhausted.",
+    "text": "After a long social event, I feel full of energy rather than exhausted.",
+    "description": "Rate how well this describes you (1 = Not at all, 5 = Describes me very well)",
     "direction": "E"
   },
   {
     "id": 4,
     "group": "EI",
-    "text": "Tôi thích chia sẻ ý tưởng ngay lập tức hơn là giữ chúng cho riêng mình.",
-    "description": "I prefer to share my ideas immediately rather than keeping them to myself.",
+    "text": "I prefer to share my ideas immediately rather than keeping them to myself.",
+    "description": "Rate how well this describes you (1 = Not at all, 5 = Describes me very well)",
     "direction": "E"
   },
   {
     "id": 5,
     "group": "EI",
-    "text": "Tôi cảm thấy thoải mái khi là trung tâm của sự chú ý.",
-    "description": "I feel comfortable being the center of attention.",
+    "text": "I feel comfortable being the center of attention.",
+    "description": "Rate how well this describes you (1 = Not at all, 5 = Describes me very well)",
     "direction": "E"
   },
   {
     "id": 6,
     "group": "SN",
-    "text": "Tôi thích thảo luận về ý tưởng trừu tượng hoặc tương lai hơn là các vấn đề hiện tại.",
-    "description": "I enjoy discussing abstract ideas or the future more than current affairs.",
+    "text": "I enjoy discussing abstract ideas or the future more than current affairs.",
+    "description": "Rate how well this describes you (1 = Not at all, 5 = Describes me very well)",
     "direction": "N"
   },
   {
     "id": 7,
     "group": "SN",
-    "text": "Tôi thường tìm kiếm ý nghĩa ẩn sau các sự kiện thay vì chỉ nhìn bề nổi.",
-    "description": "I often look for the hidden meaning behind events rather than just the surface level.",
+    "text": "I often look for the hidden meaning behind events rather than just the surface level.",
+    "description": "Rate how well this describes you (1 = Not at all, 5 = Describes me very well)",
     "direction": "N"
   },
   {
     "id": 8,
     "group": "SN",
-    "text": "Tôi thích sự thay đổi và cách làm mới hơn là các quy trình đã được thiết lập.",
-    "description": "I prefer change and new ways of doing things over established procedures.",
+    "text": "I prefer change and new ways of doing things over established procedures.",
+    "description": "Rate how well this describes you (1 = Not at all, 5 = Describes me very well)",
     "direction": "N"
   },
   {
     "id": 9,
     "group": "SN",
-    "text": "Tôi thường tin vào trực giác (cảm giác ruột) hơn là dữ liệu thực tế.",
-    "description": "I usually trust my intuition (gut feeling) more than factual data.",
+    "text": "I usually trust my intuition (gut feeling) more than factual data.",
+    "description": "Rate how well this describes you (1 = Not at all, 5 = Describes me very well)",
     "direction": "N"
   },
   {
     "id": 10,
     "group": "SN",
-    "text": "Tôi thích học lý thuyết và khái niệm tổng quan trước khi đi vào chi tiết.",
-    "description": "I prefer learning theories and general concepts before diving into details.",
+    "text": "I prefer learning theories and general concepts before diving into details.",
+    "description": "Rate how well this describes you (1 = Not at all, 5 = Describes me very well)",
     "direction": "N"
   },
   {
     "id": 11,
     "group": "TF",
-    "text": "Tôi ưu tiên sự hài hòa tập thể hơn là phân định đúng sai một cách cứng nhắc.",
-    "description": "I prioritize collective harmony over strictly defining right from wrong.",
+    "text": "I prioritize collective harmony over strictly defining right from wrong.",
+    "description": "Rate how well this describes you (1 = Not at all, 5 = Describes me very well)",
     "direction": "F"
   },
   {
     "id": 12,
     "group": "TF",
-    "text": "Khi quyết định, tôi xem xét nó sẽ ảnh hưởng đến cảm xúc của những người liên quan.",
-    "description": "When deciding, I consider how it will affect the feelings of everyone involved.",
+    "text": "When deciding, I consider how it will affect the feelings of everyone involved.",
+    "description": "Rate how well this describes you (1 = Not at all, 5 = Describes me very well)",
     "direction": "F"
   },
   {
     "id": 13,
     "group": "TF",
-    "text": "Tôi dễ dàng đồng cảm và xúc động trước câu chuyện của người khác.",
-    "description": "I am easily sympathetic and moved by other people's stories.",
+    "text": "I am easily sympathetic and moved by other people's stories.",
+    "description": "Rate how well this describes you (1 = Not at all, 5 = Describes me very well)",
     "direction": "F"
   },
   {
     "id": 14,
     "group": "TF",
-    "text": "Tôi tin rằng lòng tốt quan trọng hơn sự công bằng tuyệt đối.",
-    "description": "I believe kindness is more important than absolute fairness.",
+    "text": "I believe kindness is more important than absolute fairness.",
+    "description": "Rate how well this describes you (1 = Not at all, 5 = Describes me very well)",
     "direction": "F"
   },
   {
     "id": 15,
     "group": "TF",
-    "text": "Tôi thường đưa ra lời khuyên dựa trên sự khích lệ hơn là phê bình logic.",
-    "description": "I often give advice based on encouragement rather than logical criticism.",
+    "text": "I often give advice based on encouragement rather than logical criticism.",
+    "description": "Rate how well this describes you (1 = Not at all, 5 = Describes me very well)",
     "direction": "F"
   },
   {
     "id": 16,
     "group": "JP",
-    "text": "Tôi thích giữ các lựa chọn mở đến phút cuối hơn là lên kế hoạch sớm.",
-    "description": "I prefer to keep my options open until the last minute rather than finalizing plans early.",
+    "text": "I prefer to keep my options open until the last minute rather than finalizing plans early.",
+    "description": "Rate how well this describes you (1 = Not at all, 5 = Describes me very well)",
     "direction": "P"
   },
   {
     "id": 17,
     "group": "JP",
-    "text": "Một chút bừa bộn trên bàn làm việc giúp tôi cảm thấy sáng tạo hơn.",
-    "description": "A bit of clutter on my desk helps me feel more creative.",
+    "text": "A bit of clutter on my desk helps me feel more creative.",
+    "description": "Rate how well this describes you (1 = Not at all, 5 = Describes me very well)",
     "direction": "P"
   },
   {
     "id": 18,
     "group": "JP",
-    "text": "Tôi làm việc hiệu quả nhất dưới áp lực thời gian (gần deadline).",
-    "description": "I work most effectively under time pressure (near deadlines).",
+    "text": "I work most effectively under time pressure (near deadlines).",
+    "description": "Rate how well this describes you (1 = Not at all, 5 = Describes me very well)",
     "direction": "P"
   },
   {
     "id": 19,
     "group": "JP",
-    "text": "Tôi thích sự tự phát và ứng biến hơn là tuân theo lịch trình cố định.",
-    "description": "I prefer spontaneity and improvisation over following a fixed schedule.",
+    "text": "I prefer spontaneity and improvisation over following a fixed schedule.",
+    "description": "Rate how well this describes you (1 = Not at all, 5 = Describes me very well)",
     "direction": "P"
   },
   {
     "id": 20,
     "group": "JP",
-    "text": "Tôi thường bắt đầu nhiều dự án cùng lúc thay vì tập trung hoàn thành từng cái một.",
-    "description": "I often start multiple projects at once instead of focusing on finishing one at a time.",
+    "text": "I often start multiple projects at once instead of focusing on finishing one at a time.",
+    "description": "Rate how well this describes you (1 = Not at all, 5 = Describes me very well)",
     "direction": "P"
   }
 ]
