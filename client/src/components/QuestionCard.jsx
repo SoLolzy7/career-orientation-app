@@ -14,7 +14,7 @@ function QuestionCard({ question, description, onAnswer, currentIndex, total }) 
   
   const handleSubmit = () => {
     if (selectedScore === null) {
-      alert('Vui lòng chọn mức độ phù hợp');
+      alert('Vui lòng chọn mức độ phù hợp (1-5)');
       return;
     }
     onAnswer(selectedScore);
@@ -22,42 +22,18 @@ function QuestionCard({ question, description, onAnswer, currentIndex, total }) 
   };
   
   const handleNext = () => {
-    if (selectedScore !== null) {
-      // onAnswer đã được gọi ở handleSubmit
-      setIsAnswered(false);
-      setSelectedScore(null);
-    }
+    // Không gọi onAnswer ở đây vì đã gọi ở handleSubmit
+    setIsAnswered(false);
+    setSelectedScore(null);
   };
   
-  // Hiển thị các nút chọn điểm 1-5
-  const renderScoreButtons = () => {
-    const scores = [
-      { value: 1, label: '1', text: 'Không đúng', textEn: 'Not at all' },
-      { value: 2, label: '2', text: 'Hơi đúng', textEn: 'Slightly' },
-      { value: 3, label: '3', text: 'Trung bình', textEn: 'Moderately' },
-      { value: 4, label: '4', text: 'Khá đúng', textEn: 'Very much' },
-      { value: 5, label: '5', text: 'Rất đúng', textEn: 'Extremely' }
-    ];
-    
-    return (
-      <div className="score-grid">
-        {scores.map((score) => (
-          <motion.button
-            key={score.value}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className={`score-btn ${selectedScore === score.value ? 'selected' : ''}`}
-            onClick={() => handleScoreSelect(score.value)}
-            disabled={isAnswered}
-          >
-            <div className="score-number">{score.label}</div>
-            <div className="score-label">{score.text}</div>
-            <div className="score-label-en">{score.textEn}</div>
-          </motion.button>
-        ))}
-      </div>
-    );
-  };
+  const scores = [
+    { value: 1, label: '1', text: 'Không đúng', textEn: 'Not at all' },
+    { value: 2, label: '2', text: 'Hơi đúng', textEn: 'Slightly' },
+    { value: 3, label: '3', text: 'Trung bình', textEn: 'Moderately' },
+    { value: 4, label: '4', text: 'Khá đúng', textEn: 'Very much' },
+    { value: 5, label: '5', text: 'Rất đúng', textEn: 'Extremely' }
+  ];
   
   return (
     <motion.div
@@ -86,23 +62,66 @@ function QuestionCard({ question, description, onAnswer, currentIndex, total }) 
         
         <div style={{ marginBottom: '2rem' }}>
           <p style={{ marginBottom: '1rem', fontWeight: 'bold', textAlign: 'center' }}>
-            Mức độ phù hợp với bản thân:
+            Mức độ phù hợp với bản thân (1 = Không đúng, 5 = Rất đúng):
           </p>
-          {renderScoreButtons()}
+          <div style={{ display: 'flex', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap' }}>
+            {scores.map((score) => (
+              <button
+                key={score.value}
+                onClick={() => handleScoreSelect(score.value)}
+                disabled={isAnswered}
+                style={{
+                  flex: 1,
+                  minWidth: '70px',
+                  padding: '12px',
+                  background: selectedScore === score.value ? '#667eea' : '#f9fafb',
+                  border: selectedScore === score.value ? '2px solid #667eea' : '2px solid #e5e7eb',
+                  borderRadius: '12px',
+                  cursor: isAnswered ? 'not-allowed' : 'pointer',
+                  color: selectedScore === score.value ? 'white' : '#333',
+                  transition: 'all 0.3s ease'
+                }}
+              >
+                <div style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>{score.label}</div>
+                <div style={{ fontSize: '0.7rem' }}>{score.text}</div>
+                <div style={{ fontSize: '0.6rem', opacity: 0.7 }}>{score.textEn}</div>
+              </button>
+            ))}
+          </div>
         </div>
         
-        <div className="action-buttons" style={{ textAlign: 'center' }}>
+        <div style={{ textAlign: 'center' }}>
           {!isAnswered ? (
             <button 
-              className="btn btn-primary" 
               onClick={handleSubmit}
               disabled={selectedScore === null}
-              style={{ padding: '12px 30px' }}
+              style={{
+                padding: '12px 30px',
+                background: selectedScore === null ? '#ccc' : '#667eea',
+                color: 'white',
+                border: 'none',
+                borderRadius: '12px',
+                cursor: selectedScore === null ? 'not-allowed' : 'pointer',
+                fontSize: '16px',
+                fontWeight: 'bold'
+              }}
             >
               Xác nhận câu trả lời ✓
             </button>
           ) : (
-            <button className="btn btn-primary" onClick={handleNext}>
+            <button 
+              onClick={handleNext}
+              style={{
+                padding: '12px 30px',
+                background: '#667eea',
+                color: 'white',
+                border: 'none',
+                borderRadius: '12px',
+                cursor: 'pointer',
+                fontSize: '16px',
+                fontWeight: 'bold'
+              }}
+            >
               {currentIndex + 1 === total ? 'Xem kết quả 🎉' : 'Câu hỏi tiếp theo →'}
             </button>
           )}
