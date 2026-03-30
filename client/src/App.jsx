@@ -15,236 +15,145 @@ function App() {
   const [careersData, setCareersData] = useState({});
   const [dataLoaded, setDataLoaded] = useState(false);
 
-  // Dữ liệu mẫu dự phòng (fallback)
-  const fallbackQuestions = [
-    {
-      id: 1,
-      text: "Trong một bữa tiệc, bạn thường:",
-      options: [
-        { value: "E", text: "Hòa đồng, nói chuyện với nhiều người" },
-        { value: "I", text: "Trò chuyện với một vài người quen" }
-      ]
-    },
-    {
-      id: 2,
-      text: "Bạn thiên về cách làm việc nào hơn?",
-      options: [
-        { value: "S", text: "Thực tế, chi tiết, có kế hoạch cụ thể" },
-        { value: "N", text: "Sáng tạo, nhìn tổng thể, thích khám phá" }
-      ]
-    },
-    {
-      id: 3,
-      text: "Khi đưa ra quyết định, bạn dựa vào:",
-      options: [
-        { value: "T", text: "Logic, lý trí và phân tích" },
-        { value: "F", text: "Cảm xúc và giá trị cá nhân" }
-      ]
-    },
-    {
-      id: 4,
-      text: "Về phong cách sống, bạn thích:",
-      options: [
-        { value: "J", text: "Có kế hoạch rõ ràng, đúng giờ" },
-        { value: "P", text: "Linh hoạt, tùy hứng, thích ứng nhanh" }
-      ]
-    },
-    {
-      id: 5,
-      text: "Bạn thích làm việc trong môi trường nào?",
-      options: [
-        { value: "E", text: "Năng động, nhiều người, hoạt động nhóm" },
-        { value: "I", text: "Yên tĩnh, tập trung, làm việc độc lập" }
-      ]
-    },
-    {
-      id: 6,
-      text: "Bạn tiếp cận vấn đề mới như thế nào?",
-      options: [
-        { value: "S", text: "Dựa vào kinh nghiệm và thực tế" },
-        { value: "N", text: "Tìm kiếm ý tưởng và khả năng mới" }
-      ]
-    },
-    {
-      id: 7,
-      text: "Điều gì quan trọng hơn với bạn?",
-      options: [
-        { value: "T", text: "Sự công bằng và đúng đắn" },
-        { value: "F", text: "Sự hòa hợp và thấu hiểu" }
-      ]
-    },
-    {
-      id: 8,
-      text: "Bạn thường xử lý deadline như thế nào?",
-      options: [
-        { value: "J", text: "Lên kế hoạch từ sớm và hoàn thành trước hạn" },
-        { value: "P", text: "Làm việc dồn dập gần đến hạn" }
-      ]
-    }
-  ];
-
+  // Fallback data
   const fallbackCareers = {
     'INTJ': {
-      description: 'Nhà chiến lược - Tư duy logic, tầm nhìn xa, thích lập kế hoạch dài hạn',
+      description: 'The Strategist - Strategic thinking, independent, problem solver',
       careers: [
-        { title: 'Kỹ sư phần mềm', icon: '💻', reason: 'Phù hợp với tư duy logic và hệ thống' },
-        { title: 'Nhà phân tích dữ liệu', icon: '📊', reason: 'Khả năng phân tích và giải quyết vấn đề' },
-        { title: 'Chuyên gia chiến lược', icon: '🎯', reason: 'Tầm nhìn dài hạn và tư duy chiến lược' }
+        { title: 'Data Scientist', icon: '📊', reason: 'Strategic thinking and analytical skills' },
+        { title: 'Architect', icon: '🏛️', reason: 'Vision and systematic planning' },
+        { title: 'Strategy Consultant', icon: '🎯', reason: 'Long-term vision and strategic mindset' }
       ]
     },
     'INTP': {
-      description: 'Nhà tư duy - Sáng tạo, thích khám phá lý thuyết và ý tưởng mới',
+      description: 'The Thinker - Logical analysis, curious, enjoys exploration',
       careers: [
-        { title: 'Nhà khoa học', icon: '🔬', reason: 'Đam mê khám phá và nghiên cứu' },
-        { title: 'Kiến trúc sư', icon: '🏛️', reason: 'Tư duy sáng tạo và hệ thống' },
-        { title: 'Nhà phát triển sản phẩm', icon: '🚀', reason: 'Thích tạo ra giải pháp mới' }
-      ]
-    },
-    'ENTJ': {
-      description: 'Nhà lãnh đạo - Quyết đoán, có tầm nhìn, khả năng tổ chức tốt',
-      careers: [
-        { title: 'Giám đốc điều hành', icon: '👔', reason: 'Khả năng lãnh đạo bẩm sinh' },
-        { title: 'Quản lý dự án', icon: '📋', reason: 'Tổ chức và điều phối tốt' },
-        { title: 'Doanh nhân', icon: '💼', reason: 'Tầm nhìn và quyết đoán' }
+        { title: 'Software Developer', icon: '💻', reason: 'Logical thinking and problem-solving' },
+        { title: 'Research Scientist', icon: '🔬', reason: 'Curiosity and analytical mindset' },
+        { title: 'Philosopher', icon: '📚', reason: 'Deep thinking and abstract reasoning' }
       ]
     },
     'ENTP': {
-      description: 'Nhà đổi mới - Sáng tạo, linh hoạt, thích thử thách mới',
+      description: 'The Innovator - Creative, enjoys challenges, innovative',
       careers: [
-        { title: 'Chuyên gia marketing', icon: '📢', reason: 'Sáng tạo và tư duy đột phá' },
-        { title: 'Nhà thiết kế', icon: '🎨', reason: 'Đam mê sáng tạo' },
-        { title: 'Khởi nghiệp', icon: '🌟', reason: 'Thích thử thách và đổi mới' }
+        { title: 'Entrepreneur', icon: '🚀', reason: 'Innovation and risk-taking' },
+        { title: 'Lawyer', icon: '⚖️', reason: 'Debate skills and logical reasoning' },
+        { title: 'Advertising Executive', icon: '📢', reason: 'Creativity and persuasion' }
       ]
     },
     'INFJ': {
-      description: 'Người cố vấn - Thấu hiểu, nhạy cảm, muốn giúp đỡ người khác',
+      description: 'The Advocate - Insightful, humanistic, visionary',
       careers: [
-        { title: 'Chuyên viên tư vấn', icon: '🤝', reason: 'Khả năng thấu hiểu và đồng cảm' },
-        { title: 'Nhà tâm lý học', icon: '🧠', reason: 'Quan tâm đến con người' },
-        { title: 'Giáo viên', icon: '📚', reason: 'Đam mê truyền cảm hứng' }
-      ]
-    },
-    'INFP': {
-      description: 'Người lý tưởng - Giàu cảm xúc, sống theo giá trị cá nhân',
-      careers: [
-        { title: 'Nhà văn', icon: '✍️', reason: 'Giàu cảm xúc và sáng tạo' },
-        { title: 'Nghệ sĩ', icon: '🎭', reason: 'Biểu đạt cảm xúc qua nghệ thuật' },
-        { title: 'Chuyên viên xã hội', icon: '💝', reason: 'Muốn tạo ra thay đổi tích cực' }
-      ]
-    },
-    'ENFJ': {
-      description: 'Người truyền cảm hứng - Thân thiện, nhiệt tình, lãnh đạo tự nhiên',
-      careers: [
-        { title: 'Nhà đào tạo', icon: '🎓', reason: 'Khả năng truyền cảm hứng' },
-        { title: 'Chuyên viên nhân sự', icon: '👥', reason: 'Hiểu và kết nối con người' },
-        { title: 'Nhà báo', icon: '📰', reason: 'Giao tiếp và kết nối cộng đồng' }
+        { title: 'Writer', icon: '✍️', reason: 'Deep insight and creativity' },
+        { title: 'Counselor', icon: '🤝', reason: 'Empathy and understanding' },
+        { title: 'Nonprofit Director', icon: '💝', reason: 'Vision and humanitarian values' }
       ]
     },
     'ENFP': {
-      description: 'Nhà truyền thông - Năng động, sáng tạo, yêu thích khám phá',
+      description: 'The Explorer - Creative, energetic, loves connections',
       careers: [
-        { title: 'Chuyên gia truyền thông', icon: '📱', reason: 'Sáng tạo và linh hoạt' },
-        { title: 'Nhà tổ chức sự kiện', icon: '🎉', reason: 'Năng động và thích giao tiếp' },
-        { title: 'Hướng dẫn viên du lịch', icon: '✈️', reason: 'Yêu thích khám phá' }
+        { title: 'Marketing Specialist', icon: '📱', reason: 'Creativity and communication' },
+        { title: 'Event Planner', icon: '🎉', reason: 'Energy and organization' },
+        { title: 'Psychologist', icon: '🧠', reason: 'Understanding people' }
       ]
     },
     'ISTJ': {
-      description: 'Người thực tế - Đáng tin cậy, chi tiết, có nguyên tắc',
+      description: 'The Realist - Responsible, detail-oriented, systematic',
       careers: [
-        { title: 'Kế toán', icon: '💰', reason: 'Chi tiết và chính xác' },
-        { title: 'Quản trị văn phòng', icon: '📁', reason: 'Có tổ chức và nguyên tắc' },
-        { title: 'Luật sư', icon: '⚖️', reason: 'Tuân thủ nguyên tắc và quy định' }
-      ]
-    },
-    'ISFJ': {
-      description: 'Người chăm sóc - Tận tụy, kiên nhẫn, quan tâm đến người khác',
-      careers: [
-        { title: 'Y tá', icon: '🏥', reason: 'Chăm sóc và tận tụy' },
-        { title: 'Thủ thư', icon: '📖', reason: 'Kiên nhẫn và tỉ mỉ' },
-        { title: 'Quản lý hành chính', icon: '📋', reason: 'Có tổ chức và trách nhiệm' }
+        { title: 'Accountant', icon: '💰', reason: 'Attention to detail and accuracy' },
+        { title: 'Project Manager', icon: '📋', reason: 'Organization and responsibility' },
+        { title: 'Librarian', icon: '📖', reason: 'Systematic and detail-oriented' }
       ]
     },
     'ESTJ': {
-      description: 'Nhà quản lý - Hiệu quả, thực tế, khả năng lãnh đạo tốt',
+      description: 'The Supervisor - Organized, decisive, practical',
       careers: [
-        { title: 'Quản lý điều hành', icon: '📊', reason: 'Hiệu quả và quyết đoán' },
-        { title: 'Chuyên viên tài chính', icon: '💹', reason: 'Thực tế và logic' },
-        { title: 'Quản lý chuỗi cung ứng', icon: '🚚', reason: 'Tổ chức và điều phối tốt' }
+        { title: 'Police Officer', icon: '👮', reason: 'Decisiveness and structure' },
+        { title: 'Operations Manager', icon: '🏭', reason: 'Efficiency and organization' },
+        { title: 'Judge', icon: '⚖️', reason: 'Decisiveness and fairness' }
+      ]
+    },
+    'ISFJ': {
+      description: 'The Protector - Thoughtful, loyal, caring',
+      careers: [
+        { title: 'Pharmacist', icon: '💊', reason: 'Attention to detail and care' },
+        { title: 'Social Worker', icon: '🤝', reason: 'Empathy and dedication' },
+        { title: 'Administrative Assistant', icon: '📁', reason: 'Organization and reliability' }
       ]
     },
     'ESFJ': {
-      description: 'Người hòa đồng - Thân thiện, chu đáo, thích giúp đỡ',
+      description: 'The Caregiver - Devoted, helpful, community-oriented',
       careers: [
-        { title: 'Chuyên viên chăm sóc khách hàng', icon: '💬', reason: 'Thân thiện và chu đáo' },
-        { title: 'Nhân viên y tế cộng đồng', icon: '🏥', reason: 'Quan tâm đến cộng đồng' },
-        { title: 'Giáo viên mầm non', icon: '👶', reason: 'Yêu trẻ và kiên nhẫn' }
+        { title: 'Teacher', icon: '📚', reason: 'Nurturing and communication' },
+        { title: 'Nurse', icon: '🏥', reason: 'Caring and dedication' },
+        { title: 'Sales Representative', icon: '💼', reason: 'Social skills and helpfulness' }
       ]
     },
     'ISTP': {
-      description: 'Người thực hành - Khéo léo, thực tế, thích giải quyết vấn đề',
+      description: 'The Craftsman - Skilled craftsmanship, flexible, practical',
       careers: [
-        { title: 'Kỹ thuật viên', icon: '🔧', reason: 'Khéo léo và thực hành' },
-        { title: 'Phi công', icon: '✈️', reason: 'Phản xạ nhanh và kỹ thuật' },
-        { title: 'Kiểm sát viên', icon: '🔍', reason: 'Chi tiết và chính xác' }
+        { title: 'Mechanical Engineer', icon: '🔧', reason: 'Practical skills and problem-solving' },
+        { title: 'Pilot', icon: '✈️', reason: 'Quick reflexes and technical skills' },
+        { title: 'Forensic Analyst', icon: '🔍', reason: 'Attention to detail and analysis' }
       ]
     },
     'ESTP': {
-      description: 'Người hành động - Năng động, thực tế, thích thử thách',
+      description: 'The Doer - Action-oriented, pragmatic, risk-taker',
       careers: [
-        { title: 'Nhân viên kinh doanh', icon: '📈', reason: 'Năng động và quyết đoán' },
-        { title: 'Chuyên gia thể thao', icon: '⚽', reason: 'Thích thử thách' },
-        { title: 'Đầu bếp', icon: '🍳', reason: 'Sáng tạo và hành động nhanh' }
+        { title: 'Real Estate Agent', icon: '🏠', reason: 'Energy and negotiation skills' },
+        { title: 'Athlete', icon: '⚽', reason: 'Physical energy and competition' },
+        { title: 'EMT', icon: '🚑', reason: 'Quick decision-making under pressure' }
       ]
     },
     'ESFP': {
-      description: 'Người biểu diễn - Vui vẻ, hòa đồng, thích trung tâm',
+      description: 'The Performer - Lively, optimistic, enjoys being center of attention',
       careers: [
-        { title: 'Diễn viên', icon: '🎬', reason: 'Thích thể hiện bản thân' },
-        { title: 'MC/ Dẫn chương trình', icon: '🎤', reason: 'Giao tiếp tự nhiên' },
-        { title: 'Chuyên viên sự kiện', icon: '🎪', reason: 'Năng động và sáng tạo' }
+        { title: 'Actor', icon: '🎬', reason: 'Expression and charisma' },
+        { title: 'Tour Guide', icon: '🗺️', reason: 'Energy and communication' },
+        { title: 'Childcare Worker', icon: '👶', reason: 'Playfulness and care' }
       ]
     }
   };
 
-  // Load dữ liệu từ file JSON
+  // Load data from JSON files
   useEffect(() => {
     const loadData = async () => {
       try {
-        console.log('Đang tải dữ liệu...');
+        console.log('Loading data...');
         
-        let questions = fallbackQuestions;
+        let questions = [];
         let careers = fallbackCareers;
         
         try {
           const questionsRes = await fetch('/questions.json');
           if (questionsRes.ok) {
             questions = await questionsRes.json();
-            console.log('Đã tải questions.json thành công');
+            console.log('Successfully loaded questions.json');
           } else {
-            console.warn('Không tìm thấy questions.json, dùng dữ liệu mẫu');
+            console.warn('questions.json not found, using fallback');
           }
         } catch (e) {
-          console.warn('Lỗi tải questions.json, dùng dữ liệu mẫu:', e);
+          console.warn('Error loading questions.json:', e);
         }
         
         try {
           const careersRes = await fetch('/careers.json');
           if (careersRes.ok) {
             careers = await careersRes.json();
-            console.log('Đã tải careers.json thành công');
+            console.log('Successfully loaded careers.json');
           } else {
-            console.warn('Không tìm thấy careers.json, dùng dữ liệu mẫu');
+            console.warn('careers.json not found, using fallback');
           }
         } catch (e) {
-          console.warn('Lỗi tải careers.json, dùng dữ liệu mẫu:', e);
+          console.warn('Error loading careers.json:', e);
         }
         
         setQuestionsData(questions);
         setCareersData(careers);
         setDataLoaded(true);
       } catch (error) {
-        console.error('Lỗi tải dữ liệu:', error);
-        setQuestionsData(fallbackQuestions);
+        console.error('Error loading data:', error);
+        setQuestionsData([]);
         setCareersData(fallbackCareers);
         setDataLoaded(true);
       }
@@ -253,67 +162,80 @@ function App() {
     loadData();
   }, []);
 
-  // Hiển thị thông báo
   const showToast = (message, type = 'success') => {
     setToast({ message, type });
     setTimeout(() => setToast(null), 3000);
   };
 
-  // Tính điểm MBTI
+  // Calculate MBTI score based on sum scoring (threshold = 15)
   const calculatePersonality = (answers, questions) => {
-    const scores = { E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0 };
+    // Initialize group scores
+    const groupScores = {
+      EI: 0,  // Extroversion vs Introversion
+      SN: 0,  // Intuition vs Sensing
+      TF: 0,  // Feeling vs Thinking
+      JP: 0   // Perceiving vs Judging
+    };
     
+    // Calculate total scores for each group
     answers.forEach(answer => {
-      if (scores[answer.value] !== undefined) {
-        scores[answer.value] = (scores[answer.value] || 0) + 1;
+      const question = questions.find(q => q.id === answer.questionId);
+      if (question) {
+        const group = question.group;
+        const score = answer.value; // Value from 1-5
+        groupScores[group] += score;
       }
     });
     
-    const energy = scores.E >= scores.I ? 'E' : 'I';
-    const perception = scores.S >= scores.N ? 'S' : 'N';
-    const decision = scores.T >= scores.F ? 'T' : 'F';
-    const lifestyle = scores.J >= scores.P ? 'J' : 'P';
+    // Determine traits: Score > 15 → first trait, Score ≤ 15 → second trait
+    const energy = groupScores.EI > 15 ? 'E' : 'I';
+    const perception = groupScores.SN > 15 ? 'N' : 'S';
+    const decision = groupScores.TF > 15 ? 'F' : 'T';
+    const lifestyle = groupScores.JP > 15 ? 'P' : 'J';
     const type = energy + perception + decision + lifestyle;
     
-    const totalEI = scores.E + scores.I;
-    const totalSN = scores.S + scores.N;
-    const totalTF = scores.T + scores.F;
-    const totalJP = scores.J + scores.P;
+    // Calculate percentage strength
+    const calculatePercentage = (score) => {
+      const deviation = Math.abs(score - 15);
+      const maxDeviation = 10; // 25 - 15 = 10
+      const percentage = Math.round((deviation / maxDeviation) * 100);
+      return Math.min(percentage, 100);
+    };
     
     const percentages = {
       EI: { 
-        E: scores.E, I: scores.I, dominant: energy, 
-        percentage: totalEI > 0 ? Math.round((Math.max(scores.E, scores.I) / totalEI) * 100) : 50 
+        E: groupScores.EI, I: groupScores.EI, dominant: energy, 
+        percentage: calculatePercentage(groupScores.EI) 
       },
       SN: { 
-        S: scores.S, N: scores.N, dominant: perception, 
-        percentage: totalSN > 0 ? Math.round((Math.max(scores.S, scores.N) / totalSN) * 100) : 50 
+        S: groupScores.SN, N: groupScores.SN, dominant: perception, 
+        percentage: calculatePercentage(groupScores.SN) 
       },
       TF: { 
-        T: scores.T, F: scores.F, dominant: decision, 
-        percentage: totalTF > 0 ? Math.round((Math.max(scores.T, scores.F) / totalTF) * 100) : 50 
+        T: groupScores.TF, F: groupScores.TF, dominant: decision, 
+        percentage: calculatePercentage(groupScores.TF) 
       },
       JP: { 
-        J: scores.J, P: scores.P, dominant: lifestyle, 
-        percentage: totalJP > 0 ? Math.round((Math.max(scores.J, scores.P) / totalJP) * 100) : 50 
+        J: groupScores.JP, P: groupScores.JP, dominant: lifestyle, 
+        percentage: calculatePercentage(groupScores.JP) 
       }
     };
     
-    return { type, scores, percentages };
+    return { type, scores: groupScores, percentages };
   };
 
-  // Tính kết quả khi hoàn thành câu hỏi
+  // Calculate results when questions are completed
   useEffect(() => {
     if (step === 'questions' && answers.length === questionsData.length && questionsData.length > 0) {
       setLoading(true);
       setTimeout(() => {
         const personalityResult = calculatePersonality(answers, questionsData);
         const careerData = careersData[personalityResult.type] || {
-          description: 'Tính cách độc đáo của bạn',
+          description: 'Your unique personality type',
           careers: [
-            { title: 'Chuyên viên tư vấn hướng nghiệp', icon: '🎯', reason: 'Phù hợp với khả năng thấu hiểu' },
-            { title: 'Nhà nghiên cứu phát triển', icon: '🔬', reason: 'Tư duy phân tích tốt' },
-            { title: 'Chuyên gia sáng tạo nội dung', icon: '✍️', reason: 'Giàu ý tưởng mới' }
+            { title: 'Career Counselor', icon: '🎯', reason: 'Understanding of people' },
+            { title: 'Research Specialist', icon: '🔬', reason: 'Analytical thinking' },
+            { title: 'Content Creator', icon: '✍️', reason: 'Creative ideas' }
           ]
         };
         setResult({
@@ -326,7 +248,7 @@ function App() {
     }
   }, [answers, step, questionsData, careersData]);
 
-  // Xử lý chọn đáp án
+  // Handle answer selection (1-5 scale)
   const handleAnswer = (value) => {
     const newAnswer = {
       questionId: questionsData[currentQuestionIndex].id,
@@ -339,13 +261,11 @@ function App() {
     }
   };
 
-  // Xử lý form thông tin cá nhân
   const handlePersonalInfoSubmit = (info) => {
     setUserInfo(info);
     setStep('questions');
   };
 
-  // Gửi email
   const handleSendEmail = async () => {
     if (!result) return;
     
@@ -357,7 +277,7 @@ function App() {
       } else if (Array.isArray(result.careers)) {
         careerTitles = result.careers;
       } else {
-        careerTitles = ['Chuyên gia tư vấn hướng nghiệp', 'Nhà nghiên cứu', 'Nhà sáng tạo'];
+        careerTitles = ['Career Counselor', 'Research Specialist', 'Content Creator'];
       }
       
       await sendResultEmail(
@@ -366,16 +286,15 @@ function App() {
         result.type,
         careerTitles
       );
-      showToast('Email đã được gửi thành công! 📧', 'success');
+      showToast('Email sent successfully! 📧', 'success');
     } catch (error) {
       console.error(error);
-      showToast('Gửi email thất bại. Vui lòng thử lại! ❌', 'error');
+      showToast('Failed to send email. Please try again! ❌', 'error');
     } finally {
       setLoading(false);
     }
   };
 
-  // Làm lại bài test
   const handleRestart = () => {
     setStep('personal');
     setCurrentQuestionIndex(0);
@@ -384,19 +303,18 @@ function App() {
     setUserInfo({ name: '', email: '' });
   };
 
-  // Hiển thị loading khi chưa có dữ liệu
   if (!dataLoaded) {
     return (
       <div className="container">
         <div className="card" style={{ textAlign: 'center' }}>
           <div className="spinner"></div>
-          <p>Đang tải dữ liệu...</p>
+          <p>Loading data...</p>
         </div>
       </div>
     );
   }
 
-  // ==================== FORM NHẬP THÔNG TIN ====================
+  // Personal Information Form
   if (step === 'personal') {
     return (
       <motion.div
@@ -406,10 +324,10 @@ function App() {
       >
         <div className="card">
           <h1 style={{ fontSize: '2rem', marginBottom: '0.5rem', background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-            🌟 Khám Phá Định Hướng Nghề Nghiệp
+            🌟 Discover Your Career Path
           </h1>
           <p style={{ color: '#6b7280', marginBottom: '2rem' }}>
-            Bài test MBTI giúp bạn hiểu rõ tính cách và tìm ra nghề nghiệp phù hợp
+            MBTI personality assessment to help you understand yourself and find suitable careers
           </p>
           
           <form onSubmit={(e) => {
@@ -417,16 +335,16 @@ function App() {
             if (userInfo.name.trim() && userInfo.email.trim()) {
               handlePersonalInfoSubmit(userInfo);
             } else {
-              alert('Vui lòng điền đầy đủ thông tin');
+              alert('Please fill in all fields');
             }
           }}>
             <div className="form-group">
-              <label>👤 Họ và tên</label>
+              <label>👤 Full Name</label>
               <input
                 type="text"
                 value={userInfo.name}
                 onChange={(e) => setUserInfo({ ...userInfo, name: e.target.value })}
-                placeholder="Nhập họ tên của bạn"
+                placeholder="Enter your full name"
                 required
               />
             </div>
@@ -441,12 +359,12 @@ function App() {
                 required
               />
               <small style={{ color: '#6b7280', fontSize: '0.75rem' }}>
-                Kết quả sẽ được gửi đến email của bạn
+                Results will be sent to your email
               </small>
             </div>
             
             <button type="submit" className="btn btn-primary" style={{ width: '100%' }}>
-              Bắt đầu làm bài test 🚀
+              Start Assessment 🚀
             </button>
           </form>
         </div>
@@ -454,14 +372,45 @@ function App() {
     );
   }
 
-  // ==================== HIỂN THỊ CÂU HỎI ====================
+  // Questions with 1-5 scale
   if (step === 'questions') {
     const currentQuestion = questionsData[currentQuestionIndex];
     const percentage = ((currentQuestionIndex + 1) / questionsData.length) * 100;
     
+    const scores = [
+      { value: 1, label: '1', text: 'Not at all', textEn: 'Does not describe me' },
+      { value: 2, label: '2', text: 'Slightly', textEn: 'Describes me a little' },
+      { value: 3, label: '3', text: 'Moderately', textEn: 'Describes me moderately' },
+      { value: 4, label: '4', text: 'Very much', textEn: 'Describes me well' },
+      { value: 5, label: '5', text: 'Extremely', textEn: 'Describes me very well' }
+    ];
+    
+    const [selectedScore, setSelectedScore] = useState(null);
+    const [isAnswered, setIsAnswered] = useState(false);
+    
+    const handleScoreSelect = (score) => {
+      if (isAnswered) return;
+      setSelectedScore(score);
+    };
+    
+    const handleSubmit = () => {
+      if (selectedScore === null) {
+        alert('Please select a rating (1-5)');
+        return;
+      }
+      handleAnswer(selectedScore);
+      setIsAnswered(true);
+    };
+    
+    const handleNext = () => {
+      setIsAnswered(false);
+      setSelectedScore(null);
+    };
+    
+    if (!currentQuestion) return null;
+    
     return (
       <motion.div
-        key="questions"
         initial={{ opacity: 0, x: 50 }}
         animate={{ opacity: 1, x: 0 }}
         exit={{ opacity: 0, x: -50 }}
@@ -473,40 +422,96 @@ function App() {
               <div className="progress-fill" style={{ width: `${percentage}%` }}></div>
             </div>
             <div className="progress-text">
-              Câu {currentQuestionIndex + 1} / {questionsData.length}
+              Question {currentQuestionIndex + 1} / {questionsData.length}
             </div>
           </div>
           
-          <h2 style={{ fontSize: '1.5rem', marginBottom: '2rem', minHeight: '100px', lineHeight: '1.4' }}>
+          <h2 style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>
             {currentQuestion.text}
           </h2>
+          <p style={{ color: 'var(--gray)', marginBottom: '1.5rem', fontStyle: 'italic' }}>
+            {currentQuestion.description}
+          </p>
           
-          <div className="options-grid">
-            {currentQuestion.options.map((opt, idx) => (
-              <motion.button
-                key={idx}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                className="option-btn"
-                onClick={() => handleAnswer(opt.value)}
+          <div style={{ marginBottom: '2rem' }}>
+            <p style={{ marginBottom: '1rem', fontWeight: 'bold', textAlign: 'center' }}>
+              Rate how well this describes you (1 = Not at all, 5 = Describes me very well):
+            </p>
+            <div style={{ display: 'flex', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap' }}>
+              {scores.map((score) => (
+                <button
+                  key={score.value}
+                  onClick={() => handleScoreSelect(score.value)}
+                  disabled={isAnswered}
+                  style={{
+                    flex: 1,
+                    minWidth: '70px',
+                    padding: '12px',
+                    background: selectedScore === score.value ? '#667eea' : '#f9fafb',
+                    border: selectedScore === score.value ? '2px solid #667eea' : '2px solid #e5e7eb',
+                    borderRadius: '12px',
+                    cursor: isAnswered ? 'not-allowed' : 'pointer',
+                    color: selectedScore === score.value ? 'white' : '#333',
+                    transition: 'all 0.3s ease'
+                  }}
+                >
+                  <div style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>{score.label}</div>
+                  <div style={{ fontSize: '0.7rem' }}>{score.text}</div>
+                  <div style={{ fontSize: '0.6rem', opacity: 0.7 }}>{score.textEn}</div>
+                </button>
+              ))}
+            </div>
+          </div>
+          
+          <div style={{ textAlign: 'center' }}>
+            {!isAnswered ? (
+              <button 
+                onClick={handleSubmit}
+                disabled={selectedScore === null}
+                style={{
+                  padding: '12px 30px',
+                  background: selectedScore === null ? '#ccc' : '#667eea',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '12px',
+                  cursor: selectedScore === null ? 'not-allowed' : 'pointer',
+                  fontSize: '16px',
+                  fontWeight: 'bold'
+                }}
               >
-                {opt.text}
-              </motion.button>
-            ))}
+                Confirm Answer ✓
+              </button>
+            ) : (
+              <button 
+                onClick={handleNext}
+                style={{
+                  padding: '12px 30px',
+                  background: '#667eea',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '12px',
+                  cursor: 'pointer',
+                  fontSize: '16px',
+                  fontWeight: 'bold'
+                }}
+              >
+                {currentQuestionIndex + 1 === questionsData.length ? 'View Results 🎉' : 'Next Question →'}
+              </button>
+            )}
           </div>
         </div>
       </motion.div>
     );
   }
 
-  // ==================== HIỂN THỊ KẾT QUẢ ====================
+  // Results Page
   if (step === 'results') {
     if (loading || !result) {
       return (
         <div className="container">
           <div className="card" style={{ textAlign: 'center' }}>
             <div className="spinner"></div>
-            <p>Đang xử lý kết quả...</p>
+            <p>Processing results...</p>
           </div>
         </div>
       );
@@ -514,10 +519,10 @@ function App() {
     
     const careerList = result.careers?.careers || [];
     const traitPairs = [
-      { left: result.percentages.EI.E, right: result.percentages.EI.I, leftName: 'Hướng ngoại (E)', rightName: 'Hướng nội (I)', dominant: result.percentages.EI.dominant, percentage: result.percentages.EI.percentage },
-      { left: result.percentages.SN.S, right: result.percentages.SN.N, leftName: 'Giác quan (S)', rightName: 'Trực giác (N)', dominant: result.percentages.SN.dominant, percentage: result.percentages.SN.percentage },
-      { left: result.percentages.TF.T, right: result.percentages.TF.F, leftName: 'Lý trí (T)', rightName: 'Cảm xúc (F)', dominant: result.percentages.TF.dominant, percentage: result.percentages.TF.percentage },
-      { left: result.percentages.JP.J, right: result.percentages.JP.P, leftName: 'Nguyên tắc (J)', rightName: 'Linh hoạt (P)', dominant: result.percentages.JP.dominant, percentage: result.percentages.JP.percentage }
+      { left: result.percentages.EI.E, right: result.percentages.EI.I, leftName: 'Extroversion (E)', rightName: 'Introversion (I)', dominant: result.percentages.EI.dominant, percentage: result.percentages.EI.percentage },
+      { left: result.percentages.SN.S, right: result.percentages.SN.N, leftName: 'Sensing (S)', rightName: 'Intuition (N)', dominant: result.percentages.SN.dominant, percentage: result.percentages.SN.percentage },
+      { left: result.percentages.TF.T, right: result.percentages.TF.F, leftName: 'Thinking (T)', rightName: 'Feeling (F)', dominant: result.percentages.TF.dominant, percentage: result.percentages.TF.percentage },
+      { left: result.percentages.JP.J, right: result.percentages.JP.P, leftName: 'Judging (J)', rightName: 'Perceiving (P)', dominant: result.percentages.JP.dominant, percentage: result.percentages.JP.percentage }
     ];
     
     const getTraitName = (dominant, leftName, rightName) => {
@@ -541,7 +546,7 @@ function App() {
         >
           <div className="card">
             <h1 style={{ fontSize: '2rem', marginBottom: '0.5rem', textAlign: 'center' }}>
-              🎉 Kết Quả Của Bạn, {userInfo.name}!
+              🎉 Your Results, {userInfo.name}!
             </h1>
             
             <div style={{ textAlign: 'center', margin: '2rem 0' }}>
@@ -557,11 +562,11 @@ function App() {
                 {result.type}
               </div>
               <p style={{ color: '#6b7280', fontSize: '1.1rem' }}>
-                {result.careers.description || 'Tính cách độc đáo của bạn'}
+                {result.careers.description || 'Your unique personality type'}
               </p>
             </div>
             
-            <h3>📊 Phân Tích Chi Tiết</h3>
+            <h3>📊 Detailed Analysis</h3>
             <div className="traits-grid">
               {traitPairs.map((pair, idx) => (
                 <div key={idx} className="trait-card">
@@ -576,7 +581,7 @@ function App() {
               ))}
             </div>
             
-            <h3>💼 Gợi Ý Nghề Nghiệp Phù Hợp</h3>
+            <h3>💼 Recommended Careers</h3>
             <ul className="career-list">
               {careerList.length > 0 ? (
                 careerList.map((career, i) => (
@@ -600,7 +605,7 @@ function App() {
                 ))
               ) : (
                 <p style={{ textAlign: 'center', color: '#6b7280' }}>
-                  Đang cập nhật dữ liệu nghề nghiệp...
+                  Updating career data...
                 </p>
               )}
             </ul>
@@ -612,14 +617,14 @@ function App() {
                 disabled={loading}
                 style={{ flex: 1, minWidth: '180px' }}
               >
-                {loading ? 'Đang gửi...' : '📧 Gửi Kết Quả Qua Email'}
+                {loading ? 'Sending...' : '📧 Send Results via Email'}
               </button>
               <button 
                 onClick={handleRestart} 
                 className="btn btn-secondary"
                 style={{ flex: 1, minWidth: '180px' }}
               >
-                🔄 Làm Lại Bài Test
+                🔄 Take Test Again
               </button>
             </div>
           </div>
