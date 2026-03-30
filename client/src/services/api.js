@@ -1,36 +1,50 @@
 import emailjs from '@emailjs/browser';
 
 // ============================================
-// CẤU HÌNH EMAILJS - THAY BẰNG THÔNG TIN THẬT CỦA BẠN
+// THÔNG TIN EMAILJS CỦA BẠN
 // ============================================
-// Đăng ký tại: https://www.emailjs.com/
-// 1. PUBLIC_KEY: Vào "Account" → "API Keys" → Copy Public Key
-// 2. SERVICE_ID: Vào "Email Services" → Tạo service Gmail → Copy Service ID
-// 3. TEMPLATE_ID: Vào "Email Templates" → Tạo template → Copy Template ID
-// ============================================
-
-const PUBLIC_KEY = '_XHBDRtVZ2kIeB1ig';     // Thay bằng Public Key của bạn
-const SERVICE_ID = 'service_r27rtd7';     // Thay bằng Service ID của bạn
-const TEMPLATE_ID = 'template_8flr1rt';   // Thay bằng Template ID của bạn
+const PUBLIC_KEY = '_XHBDRtVZ2kIeB1ig';
+const SERVICE_ID = 'service_r27rtd7';
+const TEMPLATE_ID = 'template_8flr1rt';
 
 export async function sendResultEmail(to, name, personality, careers) {
+  console.log('========== BẮT ĐẦU GỬI EMAIL ==========');
+  console.log('📧 Email người nhận:', to);
+  console.log('👤 Tên:', name);
+  console.log('🧠 Tính cách:', personality);
+  console.log('💼 Danh sách nghề:', careers);
+  console.log('========================================');
+  
+  // Kiểm tra email có bị rỗng không
+  if (!to || to.trim() === '') {
+    console.error('❌ LỖI: Email người nhận bị rỗng!');
+    throw new Error('Email người nhận không hợp lệ');
+  }
+  
   try {
     // Tạo danh sách careers với định dạng HTML
     const careersHtml = careers.map(career => `
       <div style="padding: 12px; margin: 8px 0; background: #f9fafb; border-radius: 8px; border-left: 4px solid #667eea;">
-        <strong>• ${career}</strong>
+        <strong>✨ ${career}</strong>
       </div>
     `).join('');
-
+    
+    // Tạo danh sách careers dạng text (phòng trường hợp)
+    const careersText = careers.map(career => `- ${career}`).join('\n');
+    
     // Chuẩn bị dữ liệu gửi đi
     const templateParams = {
-      to_email: to,
+      email: to,                      
       user_name: name,
       personality_type: personality,
       careers_list: careersHtml,
-      reply_to: 'hoangtri@example.com', // Thay bằng email của bạn
     };
-
+    
+    console.log('📤 Template Params:', templateParams);
+    console.log('🆔 Service ID:', SERVICE_ID);
+    console.log('📄 Template ID:', TEMPLATE_ID);
+    console.log('🔑 Public Key:', PUBLIC_KEY);
+    
     // Gửi email qua EmailJS
     const response = await emailjs.send(
       SERVICE_ID,
@@ -38,12 +52,21 @@ export async function sendResultEmail(to, name, personality, careers) {
       templateParams,
       PUBLIC_KEY
     );
-
-    console.log('Email sent successfully!', response);
+    
+    console.log('✅ Email sent successfully!', response);
     return response;
     
   } catch (error) {
-    console.error('Error sending email:', error);
-    throw new Error('Không thể gửi email. Vui lòng thử lại!');
+    console.error('❌ Error sending email:', error);
+    console.error('❌ Error status:', error.status);
+    console.error('❌ Error text:', error.text);
+    console.error('❌ Error message:', error.message);
+    
+    // Hiển thị lỗi chi tiết
+    if (error.text === 'The recipients address is empty') {
+      throw new Error('Email người nhận bị trống. Vui lòng kiểm tra lại!');
+    }
+    
+    throw new Error(`Gửi email thất bại: ${error.text || error.message}`);
   }
 }
