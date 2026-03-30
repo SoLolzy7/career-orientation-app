@@ -7,7 +7,7 @@ import { calculatePersonality } from './services/scoring'
 import { sendResultEmail } from './services/api'
 
 // Import questions and careers directly from the data folder
-import questionsData from '../../../data/questions.json'
+import questions from "./questions.json"; 
 import careersData from '../../../data/careers.json'
 
 function App() {
