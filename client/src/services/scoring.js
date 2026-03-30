@@ -1,9 +1,10 @@
-// Hàm tính điểm MBTI dựa trên thang điểm 1-5
-// Điểm chuẩn cho mỗi nhóm là 15 (5 câu hỏi x 3 điểm trung bình)
-// Điểm > 15 nghiêng về trait đầu, điểm ≤ 15 nghiêng về trait sau
+// Scoring function based on 1-5 scale
+// Threshold for each group is 15 (5 questions x 3 average)
+// Score > 15 leans toward first trait (E, N, F, P)
+// Score ≤ 15 leans toward second trait (I, S, T, J)
 
 export function calculatePersonality(answers, questions) {
-  // Khởi tạo điểm số cho từng nhóm
+  // Initialize scores for each group
   const groupScores = {
     EI: 0,  // Extroversion vs Introversion
     SN: 0,  // Intuition vs Sensing
@@ -11,7 +12,7 @@ export function calculatePersonality(answers, questions) {
     JP: 0   // Perceiving vs Judging
   };
   
-  // Đếm số câu hỏi mỗi nhóm
+  // Count questions per group
   const groupCounts = {
     EI: 0,
     SN: 0,
@@ -19,36 +20,34 @@ export function calculatePersonality(answers, questions) {
     JP: 0
   };
   
-  // Tính tổng điểm cho từng nhóm
+  // Calculate total scores for each group
   answers.forEach(answer => {
     const question = questions.find(q => q.id === answer.questionId);
     if (question) {
       const group = question.group;
-      const score = answer.value; // Giá trị từ 1-5
+      const score = answer.value; // Value from 1-5
       
       groupScores[group] += score;
       groupCounts[group]++;
     }
   });
   
-  // Tính điểm trung bình và xác định trait
-  // Điểm chuẩn: 3 điểm/câu, tổng 5 câu = 15 điểm
-  // Điểm > 15: nghiêng về trait hướng ngoại (E, N, F, P)
-  // Điểm ≤ 15: nghiêng về trait hướng nội (I, S, T, J)
-  
-  const energy = groupScores.EI > 15 ? 'E' : 'I';        // EI: E > 15, I ≤ 15
-  const perception = groupScores.SN > 15 ? 'N' : 'S';    // SN: N > 15, S ≤ 15
-  const decision = groupScores.TF > 15 ? 'F' : 'T';      // TF: F > 15, T ≤ 15
-  const lifestyle = groupScores.JP > 15 ? 'P' : 'J';     // JP: P > 15, J ≤ 15
+  // Determine traits based on threshold of 15
+  // Score > 15: leans toward E, N, F, P
+  // Score ≤ 15: leans toward I, S, T, J
+  const energy = groupScores.EI > 15 ? 'E' : 'I';
+  const perception = groupScores.SN > 15 ? 'N' : 'S';
+  const decision = groupScores.TF > 15 ? 'F' : 'T';
+  const lifestyle = groupScores.JP > 15 ? 'P' : 'J';
   
   const type = energy + perception + decision + lifestyle;
   
-  // Tính tỷ lệ phần trăm cho từng cặp (dựa trên độ lệch so với điểm chuẩn)
+  // Calculate percentage for each pair (based on deviation from threshold)
   const calculatePercentage = (score, maxScore = 25) => {
-    // Điểm tối đa mỗi nhóm: 5 câu x 5 điểm = 25
-    // Điểm tối thiểu: 5 câu x 1 điểm = 5
-    // Điểm chuẩn: 15
-    // Tính phần trăm độ mạnh của trait chiếm ưu thế
+    // Max score per group: 5 questions x 5 points = 25
+    // Min score: 5 questions x 1 point = 5
+    // Threshold: 15
+    // Calculate strength percentage of dominant trait
     const deviation = Math.abs(score - 15);
     const maxDeviation = 10; // 25 - 15 = 10
     const percentage = Math.round((deviation / maxDeviation) * 100);
@@ -95,131 +94,131 @@ export function calculatePersonality(answers, questions) {
   };
 }
 
-// Lấy mô tả chi tiết cho từng trait
+// Get detailed description for each trait
 export function getTraitDescription(trait) {
   const descriptions = {
     'E': { 
-      name: 'Hướng ngoại (Extroversion)', 
-      description: 'Tràn đầy năng lượng khi ở bên người khác, thích giao tiếp và hoạt động nhóm',
-      characteristics: ['Năng động', 'Thích giao tiếp', 'Làm việc nhóm tốt']
+      name: 'Extroversion', 
+      description: 'Energized by being around others, enjoys social interaction and group activities',
+      characteristics: ['Energetic', 'Outgoing', 'Team-oriented']
     },
     'I': { 
-      name: 'Hướng nội (Introversion)', 
-      description: 'Năng lượng đến từ thời gian ở một mình, thích suy nghĩ sâu và làm việc độc lập',
-      characteristics: ['Sâu sắc', 'Tập trung', 'Làm việc độc lập']
+      name: 'Introversion', 
+      description: 'Energy comes from time alone, enjoys deep thinking and independent work',
+      characteristics: ['Thoughtful', 'Focused', 'Independent']
     },
     'S': { 
-      name: 'Giác quan (Sensing)', 
-      description: 'Chú ý đến chi tiết, thực tế, dựa vào kinh nghiệm và dữ liệu cụ thể',
-      characteristics: ['Thực tế', 'Tỉ mỉ', 'Chú ý chi tiết']
+      name: 'Sensing', 
+      description: 'Pays attention to details, practical, relies on experience and concrete data',
+      characteristics: ['Practical', 'Detail-oriented', 'Realistic']
     },
     'N': { 
-      name: 'Trực giác (Intuition)', 
-      description: 'Nhìn tổng thể, hướng về tương lai, thích khám phá ý tưởng mới',
-      characteristics: ['Sáng tạo', 'Tầm nhìn', 'Thích đổi mới']
+      name: 'Intuition', 
+      description: 'Sees the big picture, future-oriented, enjoys exploring new ideas',
+      characteristics: ['Creative', 'Visionary', 'Innovative']
     },
     'T': { 
-      name: 'Lý trí (Thinking)', 
-      description: 'Quyết định dựa trên logic, phân tích và sự thật khách quan',
-      characteristics: ['Logic', 'Phân tích', 'Công bằng']
+      name: 'Thinking', 
+      description: 'Decisions based on logic, analysis, and objective facts',
+      characteristics: ['Logical', 'Analytical', 'Fair']
     },
     'F': { 
-      name: 'Cảm xúc (Feeling)', 
-      description: 'Quyết định dựa trên giá trị cá nhân, cảm xúc và sự hài hòa',
-      characteristics: ['Đồng cảm', 'Quan tâm', 'Hài hòa']
+      name: 'Feeling', 
+      description: 'Decisions based on personal values, emotions, and harmony',
+      characteristics: ['Empathetic', 'Compassionate', 'Harmonious']
     },
     'J': { 
-      name: 'Nguyên tắc (Judging)', 
-      description: 'Thích cấu trúc, kế hoạch rõ ràng, quyết định sớm',
-      characteristics: ['Có tổ chức', 'Đúng hẹn', 'Thích kế hoạch']
+      name: 'Judging', 
+      description: 'Prefers structure, clear plans, and early decisions',
+      characteristics: ['Organized', 'Punctual', 'Planner']
     },
     'P': { 
-      name: 'Linh hoạt (Perceiving)', 
-      description: 'Thích tự do, thích ứng với thay đổi, giữ nhiều lựa chọn',
-      characteristics: ['Linh hoạt', 'Tự phát', 'Thích nghi tốt']
+      name: 'Perceiving', 
+      description: 'Enjoys flexibility, adapts to change, keeps options open',
+      characteristics: ['Flexible', 'Spontaneous', 'Adaptable']
     }
   };
   return descriptions[trait];
 }
 
-// Hàm xác định loại tính cách chi tiết dựa trên decision tree
+// Function to determine detailed personality type based on decision tree
 export function getPersonalityDetails(type, careersData) {
   const careerInfo = careersData[type] || {
-    description: 'Tính cách độc đáo của bạn',
+    description: 'Your unique personality type',
     careers: []
   };
   
-  // Phân tích nhóm tính cách dựa trên decision tree
+  // Personality analysis based on decision tree from the document
   const analysis = {
     INTJ: {
-      core: 'Nhà chiến lược - Tầm nhìn xa, độc lập, giải quyết vấn đề phức tạp',
-      strengths: ['Tư duy chiến lược', 'Độc lập', 'Kiên định']
+      core: 'The Strategist - Strategic thinking, independent, problem solver',
+      strengths: ['Strategic thinking', 'Independent', 'Decisive']
     },
     INTP: {
-      core: 'Nhà tư duy - Phân tích logic, tò mò, thích khám phá',
-      strengths: ['Logic', 'Phân tích', 'Sáng tạo']
+      core: 'The Thinker - Logical analysis, curious, enjoys exploration',
+      strengths: ['Logical', 'Analytical', 'Creative']
     },
     ENTJ: {
-      core: 'Nhà lãnh đạo - Quyết đoán, chiến lược, tổ chức',
-      strengths: ['Lãnh đạo', 'Chiến lược', 'Quyết đoán']
+      core: 'The Leader - Decisive, strategic, organized',
+      strengths: ['Leadership', 'Strategic', 'Decisive']
     },
     ENTP: {
-      core: 'Nhà phát minh - Thông minh, thích tranh luận, đổi mới',
-      strengths: ['Sáng tạo', 'Linh hoạt', 'Đàm phán']
+      core: 'The Innovator - Creative, enjoys debate, innovative',
+      strengths: ['Creative', 'Flexible', 'Negotiation']
     },
     INFJ: {
-      core: 'Người cố vấn - Sâu sắc, có tầm nhìn, nhân văn',
-      strengths: ['Thấu hiểu', 'Tầm nhìn', 'Kiên nhẫn']
+      core: 'The Advocate - Insightful, humanistic, visionary',
+      strengths: ['Understanding', 'Vision', 'Patient']
     },
     INFP: {
-      core: 'Người lý tưởng - Sáng tạo, chân thành, giàu cảm xúc',
-      strengths: ['Sáng tạo', 'Chân thành', 'Đồng cảm']
+      core: 'The Idealist - Creative, authentic, empathetic',
+      strengths: ['Creative', 'Authentic', 'Empathetic']
     },
     ENFJ: {
-      core: 'Người truyền cảm hứng - Nhiệt huyết, kết nối, lãnh đạo',
-      strengths: ['Giao tiếp', 'Lãnh đạo', 'Thấu hiểu']
+      core: 'The Mentor - Enthusiastic, connecting, inspiring',
+      strengths: ['Communication', 'Leadership', 'Understanding']
     },
     ENFP: {
-      core: 'Người khám phá - Sáng tạo, năng động, yêu thích kết nối',
-      strengths: ['Sáng tạo', 'Nhiệt huyết', 'Linh hoạt']
+      core: 'The Explorer - Creative, energetic, loves connections',
+      strengths: ['Creative', 'Enthusiastic', 'Flexible']
     },
     ISTJ: {
-      core: 'Người thực tế - Đáng tin cậy, có trách nhiệm, hệ thống',
-      strengths: ['Trách nhiệm', 'Chi tiết', 'Đáng tin cậy']
+      core: 'The Realist - Responsible, detail-oriented, systematic',
+      strengths: ['Responsible', 'Detail-oriented', 'Reliable']
     },
     ISFJ: {
-      core: 'Người bảo vệ - Tận tụy, chu đáo, quan tâm người khác',
-      strengths: ['Chu đáo', 'Tận tâm', 'Kiên nhẫn']
+      core: 'The Protector - Dedicated, thoughtful, caring',
+      strengths: ['Thoughtful', 'Dedicated', 'Patient']
     },
     ESTJ: {
-      core: 'Người quản lý - Thực tế, hiệu quả, lãnh đạo',
-      strengths: ['Tổ chức', 'Quyết đoán', 'Hiệu quả']
+      core: 'The Supervisor - Practical, efficient, organized',
+      strengths: ['Organized', 'Decisive', 'Efficient']
     },
     ESFJ: {
-      core: 'Người chăm sóc - Ấm áp, quan tâm, xây dựng cộng đồng',
-      strengths: ['Quan tâm', 'Hòa đồng', 'Trách nhiệm']
+      core: 'The Caregiver - Warm, caring, community builder',
+      strengths: ['Caring', 'Social', 'Responsible']
     },
     ISTP: {
-      core: 'Người thực hành - Khéo léo, thực tế, giải quyết vấn đề',
-      strengths: ['Khéo léo', 'Thực tế', 'Giải quyết vấn đề']
+      core: 'The Craftsman - Skilled, practical, problem solver',
+      strengths: ['Skilled', 'Practical', 'Problem solver']
     },
     ISFP: {
-      core: 'Người nghệ sĩ - Nhạy cảm, sáng tạo, yêu thích cái đẹp',
-      strengths: ['Sáng tạo', 'Nhạy cảm', 'Chân thành']
+      core: 'The Artist - Sensitive, creative, appreciates beauty',
+      strengths: ['Creative', 'Sensitive', 'Authentic']
     },
     ESTP: {
-      core: 'Người hành động - Năng động, thích mạo hiểm, thực tế',
-      strengths: ['Năng động', 'Thực tế', 'Quyết đoán']
+      core: 'The Doer - Action-oriented, pragmatic, risk-taker',
+      strengths: ['Energetic', 'Practical', 'Decisive']
     },
     ESFP: {
-      core: 'Người giải trí - Vui vẻ, nhiệt tình, thích làm trung tâm',
-      strengths: ['Vui vẻ', 'Nhiệt tình', 'Linh hoạt']
+      core: 'The Performer - Lively, optimistic, enjoys being center of attention',
+      strengths: ['Energetic', 'Enthusiastic', 'Flexible']
     }
   };
   
   return {
     ...careerInfo,
-    coreDescription: analysis[type]?.core || 'Tính cách độc đáo của bạn',
-    strengths: analysis[type]?.strengths || ['Sáng tạo', 'Linh hoạt', 'Kiên trì']
+    coreDescription: analysis[type]?.core || 'Your unique personality type',
+    strengths: analysis[type]?.strengths || ['Creative', 'Flexible', 'Persistent']
   };
 }
