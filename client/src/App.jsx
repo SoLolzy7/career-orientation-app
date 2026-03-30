@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { sendResultEmail } from './services/api';
-import CareerResults from './components/CareerResults';
 import './index.css';
 
 function App() {
@@ -17,7 +16,7 @@ function App() {
   const [careersData, setCareersData] = useState({});
   const [dataLoaded, setDataLoaded] = useState(false);
   
-  // State for current question (always declared at top)
+  // State for current question
   const [selectedScore, setSelectedScore] = useState(null);
   const [isAnswered, setIsAnswered] = useState(false);
 
@@ -178,6 +177,7 @@ function App() {
             console.log('Successfully loaded questions.json');
           } else {
             console.warn('questions.json not found, using fallback');
+            // Use empty array - we'll handle empty questions
           }
         } catch (e) {
           console.warn('Error loading questions.json:', e);
@@ -310,17 +310,35 @@ function App() {
     }
   }, [answers, step, questionsData, careersData]);
 
-  // Handle answer selection (1-5 scale)
+  // Handle answer selection - AUTO GO TO NEXT QUESTION
   const handleAnswer = (value) => {
     const newAnswer = {
       questionId: questionsData[currentQuestionIndex].id,
       value: value,
     };
-    setAnswers([...answers, newAnswer]);
-
+    
+    const newAnswers = [...answers, newAnswer];
+    setAnswers(newAnswers);
+    
+    // Auto move to next question after answering
     if (currentQuestionIndex + 1 < questionsData.length) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
-      // Reset question state for next question
+      setSelectedScore(null);
+      setIsAnswered(false);
+    } else {
+      // If this is the last question, mark as answered and let useEffect handle results
+      setIsAnswered(true);
+      // The useEffect will trigger when answers length equals questions length
+    }
+  };
+  
+  // Handle previous question
+  const handlePrevious = () => {
+    if (currentQuestionIndex > 0) {
+      // Remove the last answer when going back
+      const newAnswers = answers.slice(0, -1);
+      setAnswers(newAnswers);
+      setCurrentQuestionIndex(currentQuestionIndex - 1);
       setSelectedScore(null);
       setIsAnswered(false);
     }
@@ -332,23 +350,13 @@ function App() {
     setSelectedScore(score);
   };
   
-  // Handle submit for current question
+  // Handle submit for current question - NOW AUTO GOES TO NEXT
   const handleSubmit = () => {
     if (selectedScore === null) {
       alert('Please select a rating (1-5)');
       return;
     }
     handleAnswer(selectedScore);
-    setIsAnswered(true);
-  };
-  
-  // Handle next question (when clicking next after answering)
-  const handleNext = () => {
-    if (currentQuestionIndex + 1 < questionsData.length) {
-      setSelectedScore(null);
-      setIsAnswered(false);
-    }
-    // If it's the last question, the useEffect will trigger the result calculation
   };
 
   const handlePersonalInfoSubmit = (info) => {
@@ -479,14 +487,15 @@ function App() {
       );
     }
     
+    // Check if current question already has an answer
+    const currentAnswer = answers.find(a => a.questionId === currentQuestion.id);
+    const hasAnswer = !!currentAnswer;
+    
+    // If we're revisiting a question, show the selected score
+    const displayScore = hasAnswer ? currentAnswer.value : selectedScore;
+    
     return (
-      <motion.div
-        key={currentQuestionIndex}
-        initial={{ opacity: 0, x: 50 }}
-        animate={{ opacity: 1, x: 0 }}
-        exit={{ opacity: 0, x: -50 }}
-        className="container"
-      >
+      <div className="container">
         <div className="card">
           <div className="progress-container">
             <div className="progress-bar">
@@ -513,16 +522,16 @@ function App() {
                 <button
                   key={score.value}
                   onClick={() => handleScoreSelect(score.value)}
-                  disabled={isAnswered}
+                  disabled={hasAnswer}
                   style={{
                     flex: 1,
                     minWidth: '70px',
                     padding: '12px',
-                    background: selectedScore === score.value ? '#667eea' : '#f9fafb',
-                    border: selectedScore === score.value ? '2px solid #667eea' : '2px solid #e5e7eb',
+                    background: displayScore === score.value ? '#667eea' : '#f9fafb',
+                    border: displayScore === score.value ? '2px solid #667eea' : '2px solid #e5e7eb',
                     borderRadius: '12px',
-                    cursor: isAnswered ? 'not-allowed' : 'pointer',
-                    color: selectedScore === score.value ? 'white' : '#333',
+                    cursor: hasAnswer ? 'not-allowed' : 'pointer',
+                    color: displayScore === score.value ? 'white' : '#333',
                     transition: 'all 0.3s ease'
                   }}
                 >
@@ -534,8 +543,25 @@ function App() {
             </div>
           </div>
           
-          <div style={{ textAlign: 'center' }}>
-            {!isAnswered ? (
+          <div style={{ display: 'flex', justifyContent: 'space-between', gap: '1rem' }}>
+            <button 
+              onClick={handlePrevious}
+              disabled={currentQuestionIndex === 0}
+              style={{
+                padding: '12px 30px',
+                background: currentQuestionIndex === 0 ? '#ccc' : '#6b7280',
+                color: 'white',
+                border: 'none',
+                borderRadius: '12px',
+                cursor: currentQuestionIndex === 0 ? 'not-allowed' : 'pointer',
+                fontSize: '16px',
+                fontWeight: 'bold'
+              }}
+            >
+              ← Previous
+            </button>
+            
+            {!hasAnswer ? (
               <button 
                 onClick={handleSubmit}
                 disabled={selectedScore === null}
@@ -547,31 +573,44 @@ function App() {
                   borderRadius: '12px',
                   cursor: selectedScore === null ? 'not-allowed' : 'pointer',
                   fontSize: '16px',
-                  fontWeight: 'bold'
+                  fontWeight: 'bold',
+                  flex: 1
                 }}
               >
                 Confirm Answer ✓
               </button>
             ) : (
               <button 
-                onClick={handleNext}
+                onClick={() => {
+                  if (currentQuestionIndex + 1 < questionsData.length) {
+                    setCurrentQuestionIndex(currentQuestionIndex + 1);
+                    setSelectedScore(null);
+                  }
+                }}
+                disabled={currentQuestionIndex + 1 >= questionsData.length}
                 style={{
                   padding: '12px 30px',
-                  background: '#667eea',
+                  background: currentQuestionIndex + 1 >= questionsData.length ? '#ccc' : '#10b981',
                   color: 'white',
                   border: 'none',
                   borderRadius: '12px',
-                  cursor: 'pointer',
+                  cursor: currentQuestionIndex + 1 >= questionsData.length ? 'not-allowed' : 'pointer',
                   fontSize: '16px',
-                  fontWeight: 'bold'
+                  fontWeight: 'bold',
+                  flex: 1
                 }}
               >
-                {currentQuestionIndex + 1 === questionsData.length ? 'View Results 🎉' : 'Next Question →'}
+                {currentQuestionIndex + 1 === questionsData.length ? 'Last Question' : 'Next →'}
               </button>
             )}
           </div>
+          
+          {/* Show completion status */}
+          <div style={{ marginTop: '1rem', textAlign: 'center', fontSize: '0.875rem', color: 'var(--gray)' }}>
+            Completed: {answers.length} / {questionsData.length} questions
+          </div>
         </div>
-      </motion.div>
+      </div>
     );
   }
 
@@ -588,17 +627,118 @@ function App() {
       );
     }
     
+    const careerList = result.careers?.careers || [];
+    const traitPairs = [
+      { left: result.percentages.EI.E, right: result.percentages.EI.I, leftName: 'Extroversion (E)', rightName: 'Introversion (I)', dominant: result.percentages.EI.dominant, percentage: result.percentages.EI.percentage },
+      { left: result.percentages.SN.S, right: result.percentages.SN.N, leftName: 'Sensing (S)', rightName: 'Intuition (N)', dominant: result.percentages.SN.dominant, percentage: result.percentages.SN.percentage },
+      { left: result.percentages.TF.T, right: result.percentages.TF.F, leftName: 'Thinking (T)', rightName: 'Feeling (F)', dominant: result.percentages.TF.dominant, percentage: result.percentages.TF.percentage },
+      { left: result.percentages.JP.J, right: result.percentages.JP.P, leftName: 'Judging (J)', rightName: 'Perceiving (P)', dominant: result.percentages.JP.dominant, percentage: result.percentages.JP.percentage }
+    ];
+    
+    const getTraitName = (dominant, leftName, rightName) => {
+      if (dominant === 'E') return leftName.split('(')[0];
+      if (dominant === 'I') return rightName.split('(')[0];
+      if (dominant === 'S') return leftName.split('(')[0];
+      if (dominant === 'N') return rightName.split('(')[0];
+      if (dominant === 'T') return leftName.split('(')[0];
+      if (dominant === 'F') return rightName.split('(')[0];
+      if (dominant === 'J') return leftName.split('(')[0];
+      if (dominant === 'P') return rightName.split('(')[0];
+      return '';
+    };
+    
     return (
       <>
-        <CareerResults
-          name={userInfo.name}
-          personality={result.type}
-          careers={result.careers}
-          percentages={result.percentages}
-          onSendEmail={handleSendEmail}
-          loading={loading}
-          onRestart={handleRestart}
-        />
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="container"
+        >
+          <div className="card">
+            <h1 style={{ fontSize: '2rem', marginBottom: '0.5rem', textAlign: 'center' }}>
+              🎉 Your Results, {userInfo.name}!
+            </h1>
+            
+            <div style={{ textAlign: 'center', margin: '2rem 0' }}>
+              <div style={{ 
+                fontSize: '4rem', 
+                fontWeight: 'bold',
+                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                marginBottom: '0.5rem',
+                letterSpacing: '4px'
+              }}>
+                {result.type}
+              </div>
+              <p style={{ color: '#6b7280', fontSize: '1.1rem' }}>
+                {result.careers.description || 'Your unique personality type'}
+              </p>
+            </div>
+            
+            <h3>📊 Detailed Analysis</h3>
+            <div className="traits-grid">
+              {traitPairs.map((pair, idx) => (
+                <div key={idx} className="trait-card">
+                  <div className="trait-letter">{pair.dominant}</div>
+                  <div className="trait-name">
+                    {getTraitName(pair.dominant, pair.leftName, pair.rightName)}
+                  </div>
+                  <div style={{ marginTop: '0.5rem', fontSize: '0.875rem', fontWeight: 'bold', color: '#667eea' }}>
+                    {pair.percentage}%
+                  </div>
+                </div>
+              ))}
+            </div>
+            
+            <h3>💼 Recommended Careers</h3>
+            <ul className="career-list">
+              {careerList.length > 0 ? (
+                careerList.map((career, i) => (
+                  <motion.li
+                    key={i}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: i * 0.1 }}
+                    className="career-item"
+                  >
+                    <span className="career-icon">{career.icon || '💼'}</span>
+                    <div>
+                      <strong>{career.title || career}</strong>
+                      {career.reason && (
+                        <div style={{ fontSize: '0.875rem', color: '#6b7280', marginTop: '4px' }}>
+                          {career.reason}
+                        </div>
+                      )}
+                    </div>
+                  </motion.li>
+                ))
+              ) : (
+                <p style={{ textAlign: 'center', color: '#6b7280' }}>
+                  Updating career data...
+                </p>
+              )}
+            </ul>
+            
+            <div style={{ display: 'flex', gap: '1rem', marginTop: '2rem', flexWrap: 'wrap' }}>
+              <button 
+                onClick={handleSendEmail} 
+                className="btn btn-primary" 
+                disabled={loading}
+                style={{ flex: 1, minWidth: '180px' }}
+              >
+                {loading ? 'Sending...' : '📧 Send Results via Email'}
+              </button>
+              <button 
+                onClick={handleRestart} 
+                className="btn btn-secondary"
+                style={{ flex: 1, minWidth: '180px' }}
+              >
+                🔄 Take Test Again
+              </button>
+            </div>
+          </div>
+        </motion.div>
         
         {toast && (
           <div className={`toast toast-${toast.type}`}>
