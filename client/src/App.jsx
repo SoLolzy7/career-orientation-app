@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { sendResultEmail } from './services/api';
 import './index.css';
 
 function App() {
-  const [step, setStep] = useState('personal'); // personal, questions, results
+  const [step, setStep] = useState('personal');
   const [userInfo, setUserInfo] = useState({ name: '', email: '' });
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState([]);
@@ -15,7 +15,7 @@ function App() {
   const [careersData, setCareersData] = useState({});
   const [dataLoaded, setDataLoaded] = useState(false);
 
-  // Dữ liệu mẫu dự phòng (fallback) nếu không load được file JSON
+  // Dữ liệu mẫu dự phòng (fallback)
   const fallbackQuestions = [
     {
       id: 1,
@@ -212,7 +212,6 @@ function App() {
       try {
         console.log('Đang tải dữ liệu...');
         
-        // Thử tải file JSON, nếu không được thì dùng fallback
         let questions = fallbackQuestions;
         let careers = fallbackCareers;
         
@@ -245,11 +244,9 @@ function App() {
         setDataLoaded(true);
       } catch (error) {
         console.error('Lỗi tải dữ liệu:', error);
-        // Dùng fallback nếu tất cả đều lỗi
         setQuestionsData(fallbackQuestions);
         setCareersData(fallbackCareers);
         setDataLoaded(true);
-        alert('Sử dụng dữ liệu mẫu. Nếu muốn dùng dữ liệu riêng, hãy thêm file questions.json và careers.json vào thư mục public!');
       }
     };
     
@@ -285,27 +282,19 @@ function App() {
     
     const percentages = {
       EI: { 
-        E: scores.E, 
-        I: scores.I, 
-        dominant: energy, 
+        E: scores.E, I: scores.I, dominant: energy, 
         percentage: totalEI > 0 ? Math.round((Math.max(scores.E, scores.I) / totalEI) * 100) : 50 
       },
       SN: { 
-        S: scores.S, 
-        N: scores.N, 
-        dominant: perception, 
+        S: scores.S, N: scores.N, dominant: perception, 
         percentage: totalSN > 0 ? Math.round((Math.max(scores.S, scores.N) / totalSN) * 100) : 50 
       },
       TF: { 
-        T: scores.T, 
-        F: scores.F, 
-        dominant: decision, 
+        T: scores.T, F: scores.F, dominant: decision, 
         percentage: totalTF > 0 ? Math.round((Math.max(scores.T, scores.F) / totalTF) * 100) : 50 
       },
       JP: { 
-        J: scores.J, 
-        P: scores.P, 
-        dominant: lifestyle, 
+        J: scores.J, P: scores.P, dominant: lifestyle, 
         percentage: totalJP > 0 ? Math.round((Math.max(scores.J, scores.P) / totalJP) * 100) : 50 
       }
     };
@@ -337,41 +326,26 @@ function App() {
     }
   }, [answers, step, questionsData, careersData]);
 
+  // Xử lý chọn đáp án
+  const handleAnswer = (value) => {
+    const newAnswer = {
+      questionId: questionsData[currentQuestionIndex].id,
+      value: value,
+    };
+    setAnswers([...answers, newAnswer]);
+
+    if (currentQuestionIndex + 1 < questionsData.length) {
+      setCurrentQuestionIndex(currentQuestionIndex + 1);
+    }
+  };
+
   // Xử lý form thông tin cá nhân
   const handlePersonalInfoSubmit = (info) => {
     setUserInfo(info);
     setStep('questions');
   };
 
-  // Xử lý chọn đáp án
-const handleAnswer = (score) => {
-  const newAnswer = {
-    questionId: questionsData[currentQuestionIndex].id,
-    value: score,  // score từ 1-5
-    group: questionsData[currentQuestionIndex].group
-  };
-  setAnswers([...answers, newAnswer]);
-
-  if (currentQuestionIndex + 1 < questionsData.length) {
-    setCurrentQuestionIndex(currentQuestionIndex + 1);
-  }
-};
-
-// Cập nhật phần render QuestionCard
-if (step === 'questions') {
-  const currentQuestion = questionsData[currentQuestionIndex];
-  return (
-    <QuestionCard
-      question={currentQuestion.text}
-      description={currentQuestion.description}
-      onAnswer={handleAnswer}
-      currentIndex={currentQuestionIndex}
-      total={questionsData.length}
-    />
-  );
-}
-
-  // Gửi email qua EmailJS
+  // Gửi email
   const handleSendEmail = async () => {
     if (!result) return;
     
@@ -422,7 +396,7 @@ if (step === 'questions') {
     );
   }
 
-  // Form nhập thông tin cá nhân
+  // ==================== FORM NHẬP THÔNG TIN ====================
   if (step === 'personal') {
     return (
       <motion.div
@@ -480,7 +454,7 @@ if (step === 'questions') {
     );
   }
 
-  // Hiển thị câu hỏi
+  // ==================== HIỂN THỊ CÂU HỎI ====================
   if (step === 'questions') {
     const currentQuestion = questionsData[currentQuestionIndex];
     const percentage = ((currentQuestionIndex + 1) / questionsData.length) * 100;
@@ -525,7 +499,7 @@ if (step === 'questions') {
     );
   }
 
-  // Hiển thị kết quả
+  // ==================== HIỂN THỊ KẾT QUẢ ====================
   if (step === 'results') {
     if (loading || !result) {
       return (
@@ -545,6 +519,18 @@ if (step === 'questions') {
       { left: result.percentages.TF.T, right: result.percentages.TF.F, leftName: 'Lý trí (T)', rightName: 'Cảm xúc (F)', dominant: result.percentages.TF.dominant, percentage: result.percentages.TF.percentage },
       { left: result.percentages.JP.J, right: result.percentages.JP.P, leftName: 'Nguyên tắc (J)', rightName: 'Linh hoạt (P)', dominant: result.percentages.JP.dominant, percentage: result.percentages.JP.percentage }
     ];
+    
+    const getTraitName = (dominant, leftName, rightName) => {
+      if (dominant === 'E') return leftName.split('(')[0];
+      if (dominant === 'I') return rightName.split('(')[0];
+      if (dominant === 'S') return leftName.split('(')[0];
+      if (dominant === 'N') return rightName.split('(')[0];
+      if (dominant === 'T') return leftName.split('(')[0];
+      if (dominant === 'F') return rightName.split('(')[0];
+      if (dominant === 'J') return leftName.split('(')[0];
+      if (dominant === 'P') return rightName.split('(')[0];
+      return '';
+    };
     
     return (
       <>
@@ -581,14 +567,7 @@ if (step === 'questions') {
                 <div key={idx} className="trait-card">
                   <div className="trait-letter">{pair.dominant}</div>
                   <div className="trait-name">
-                    {pair.dominant === 'E' ? pair.leftName.split('(')[0] : 
-                     pair.dominant === 'I' ? pair.rightName.split('(')[0] :
-                     pair.dominant === 'S' ? pair.leftName.split('(')[0] :
-                     pair.dominant === 'N' ? pair.rightName.split('(')[0] :
-                     pair.dominant === 'T' ? pair.leftName.split('(')[0] :
-                     pair.dominant === 'F' ? pair.rightName.split('(')[0] :
-                     pair.dominant === 'J' ? pair.leftName.split('(')[0] :
-                     pair.rightName.split('(')[0]}
+                    {getTraitName(pair.dominant, pair.leftName, pair.rightName)}
                   </div>
                   <div style={{ marginTop: '0.5rem', fontSize: '0.875rem', fontWeight: 'bold', color: '#667eea' }}>
                     {pair.percentage}%
