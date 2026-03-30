@@ -1,14 +1,122 @@
 {
-  "INTJ": ["Data Scientist", "Architect", "Strategy Consultant"],
-  "ENFP": ["Marketing Specialist", "Event Planner", "Psychologist"],
-  "ISTJ": ["Accountant", "Project Manager", "Librarian"],
-  "ESFJ": ["Teacher", "Nurse", "Sales Representative"],
-  "INTP": ["Software Developer", "Philosopher", "Research Scientist"],
-  "ENTP": ["Entrepreneur", "Lawyer", "Advertising Executive"],
-  "INFJ": ["Writer", "Counselor", "Nonprofit Director"],
-  "ESTJ": ["Police Officer", "Operations Manager", "Judge"],
-  "ISTP": ["Mechanical Engineer", "Pilot", "Forensic Analyst"],
-  "ESTP": ["Real Estate Agent", "Athlete", "Emergency Medical Technician"],
-  "ISFJ": ["Pharmacist", "Social Worker", "Administrative Assistant"],
-  "ESFP": ["Actor", "Tour Guide", "Childcare Worker"]
+  "INTJ": {
+    "description": "Nhà chiến lược - Bạn có tầm nhìn xa, thích lập kế hoạch và giải quyết vấn đề phức tạp.",
+    "careers": [
+      { "title": "Nhà khoa học dữ liệu", "titleEn": "Data Scientist", "reason": "Phân tích dữ liệu phức tạp và tìm ra xu hướng" },
+      { "title": "Kiến trúc sư phần mềm", "titleEn": "Software Architect", "reason": "Thiết kế hệ thống phần mềm quy mô lớn" },
+      { "title": "Chuyên gia tư vấn chiến lược", "titleEn": "Strategy Consultant", "reason": "Đưa ra quyết định quan trọng cho doanh nghiệp" },
+      { "title": "Nhà sáng lập startup", "titleEn": "Startup Founder", "reason": "Biến ý tưởng thành hiện thực" },
+      { "title": "Chuyên gia AI/ML", "titleEn": "AI/ML Engineer", "reason": "Xây dựng hệ thống thông minh" }
+    ]
+  },
+  "ENFP": {
+    "description": "Người truyền cảm hứng - Bạn sáng tạo, nhiệt huyết và yêu thích kết nối với mọi người.",
+    "careers": [
+      { "title": "Chuyên viên Marketing", "titleEn": "Marketing Specialist", "reason": "Sáng tạo nội dung và chiến dịch hấp dẫn" },
+      { "title": "Nhà tâm lý học", "titleEn": "Psychologist", "reason": "Thấu hiểu và giúp đỡ người khác" },
+      { "title": "Đạo diễn sáng tạo", "titleEn": "Creative Director", "reason": "Dẫn dắt dự án nghệ thuật" },
+      { "title": "Nhà văn/Nhà báo", "titleEn": "Writer/Journalist", "reason": "Kể chuyện và truyền cảm hứng" },
+      { "title": "Chuyên viên đào tạo", "titleEn": "Trainer", "reason": "Phát triển con người" }
+    ]
+  },
+  "ISTJ": {
+    "description": "Người thực tế - Bạn đáng tin cậy, có trách nhiệm và làm việc có hệ thống.",
+    "careers": [
+      { "title": "Kế toán viên", "titleEn": "Accountant", "reason": "Làm việc với số liệu chính xác" },
+      { "title": "Quản lý dự án", "titleEn": "Project Manager", "reason": "Tổ chức và điều phối công việc" },
+      { "title": "Thủ thư", "titleEn": "Librarian", "reason": "Sắp xếp thông tin có hệ thống" },
+      { "title": "Chuyên viên kiểm toán", "titleEn": "Auditor", "reason": "Kiểm tra chi tiết" },
+      { "title": "Quản trị viên hệ thống", "titleEn": "System Administrator", "reason": "Duy trì hệ thống ổn định" }
+    ]
+  },
+  "ESFJ": {
+    "description": "Người chăm sóc - Bạn ấm áp, quan tâm và thích xây dựng cộng đồng.",
+    "careers": [
+      { "title": "Giáo viên", "titleEn": "Teacher", "reason": "Hướng dẫn và nuôi dưỡng thế hệ trẻ" },
+      { "title": "Y tá", "titleEn": "Nurse", "reason": "Chăm sóc sức khỏe bệnh nhân" },
+      { "title": "Nhân viên công tác xã hội", "titleEn": "Social Worker", "reason": "Giúp đỡ cộng đồng" },
+      { "title": "Chuyên viên nhân sự", "titleEn": "HR Specialist", "reason": "Chăm lo nhân viên" },
+      { "title": "Quản lý dịch vụ khách hàng", "titleEn": "Customer Service Manager", "reason": "Xây dựng mối quan hệ" }
+    ]
+  },
+  "INTP": {
+    "description": "Nhà tư duy - Bạn thích phân tích, tìm hiểu và giải quyết vấn đề phức tạp.",
+    "careers": [
+      { "title": "Nhà phát triển phần mềm", "titleEn": "Software Developer", "reason": "Giải quyết vấn đề logic" },
+      { "title": "Nhà nghiên cứu khoa học", "titleEn": "Research Scientist", "reason": "Khám phá tri thức mới" },
+      { "title": "Kỹ sư phần mềm", "titleEn": "Software Engineer", "reason": "Xây dựng giải pháp kỹ thuật" },
+      { "title": "Kiến trúc sư", "titleEn": "Architect", "reason": "Thiết kế có hệ thống" },
+      { "title": "Nhà phân tích dữ liệu", "titleEn": "Data Analyst", "reason": "Tìm ra quy luật từ dữ liệu" }
+    ]
+  },
+  "ENTP": {
+    "description": "Nhà phát minh - Bạn thông minh, thích tranh luận và đổi mới.",
+    "careers": [
+      { "title": "Doanh nhân", "titleEn": "Entrepreneur", "reason": "Tạo ra cơ hội mới" },
+      { "title": "Luật sư", "titleEn": "Lawyer", "reason": "Tranh luận và bảo vệ" },
+      { "title": "Chuyên viên quảng cáo", "titleEn": "Advertising Specialist", "reason": "Sáng tạo ý tưởng độc đáo" },
+      { "title": "Nhà phát minh", "titleEn": "Inventor", "reason": "Tạo ra sản phẩm mới" },
+      { "title": "Giám đốc sáng tạo", "titleEn": "Creative Director", "reason": "Dẫn dắt đổi mới" }
+    ]
+  },
+  "INFJ": {
+    "description": "Người cố vấn - Bạn sâu sắc, có tầm nhìn và muốn tạo ra sự khác biệt.",
+    "careers": [
+      { "title": "Nhà văn", "titleEn": "Writer", "reason": "Truyền tải thông điệp sâu sắc" },
+      { "title": "Chuyên viên tư vấn tâm lý", "titleEn": "Counselor", "reason": "Thấu hiểu và giúp đỡ" },
+      { "title": "Giám đốc tổ chức phi lợi nhuận", "titleEn": "NGO Director", "reason": "Tạo tác động xã hội" },
+      { "title": "Nhà thiết kế UX", "titleEn": "UX Designer", "reason": "Tạo trải nghiệm ý nghĩa" },
+      { "title": "Chuyên viên nhân sự chiến lược", "titleEn": "HR Strategist", "reason": "Phát triển con người" }
+    ]
+  },
+  "ESTJ": {
+    "description": "Người quản lý - Bạn thực tế, hiệu quả và có khả năng lãnh đạo.",
+    "careers": [
+      { "title": "Giám đốc điều hành", "titleEn": "CEO/Executive", "reason": "Lãnh đạo và quản lý" },
+      { "title": "Quản lý dự án", "titleEn": "Project Manager", "reason": "Đảm bảo hiệu quả công việc" },
+      { "title": "Cảnh sát", "titleEn": "Police Officer", "reason": "Duy trì trật tự" },
+      { "title": "Thẩm phán", "titleEn": "Judge", "reason": "Ra quyết định công bằng" },
+      { "title": "Quản trị kinh doanh", "titleEn": "Business Administrator", "reason": "Vận hành tổ chức" }
+    ]
+  },
+  "ISTP": {
+    "description": "Người thực hành - Bạn khéo léo, thực tế và thích giải quyết vấn đề bằng tay.",
+    "careers": [
+      { "title": "Kỹ sư cơ khí", "titleEn": "Mechanical Engineer", "reason": "Sửa chữa và xây dựng" },
+      { "title": "Phi công", "titleEn": "Pilot", "reason": "Vận hành thiết bị phức tạp" },
+      { "title": "Chuyên gia pháp y", "titleEn": "Forensic Expert", "reason": "Phân tích hiện trường" },
+      { "title": "Thợ điện", "titleEn": "Electrician", "reason": "Sửa chữa hệ thống" },
+      { "title": "Lập trình viên", "titleEn": "Programmer", "reason": "Giải quyết vấn đề kỹ thuật" }
+    ]
+  },
+  "ESTP": {
+    "description": "Người hành động - Bạn năng động, thích mạo hiểm và giải quyết vấn đề nhanh chóng.",
+    "careers": [
+      { "title": "Môi giới bất động sản", "titleEn": "Real Estate Agent", "reason": "Đàm phán và bán hàng" },
+      { "title": "Vận động viên", "titleEn": "Athlete", "reason": "Thử thách thể chất" },
+      { "title": "Nhân viên cấp cứu", "titleEn": "Paramedic", "reason": "Phản ứng nhanh" },
+      { "title": "Nhà đầu tư", "titleEn": "Investor", "reason": "Chấp nhận rủi ro" },
+      { "title": "Quản lý nhà hàng", "titleEn": "Restaurant Manager", "reason": "Môi trường năng động" }
+    ]
+  },
+  "ISFJ": {
+    "description": "Người bảo vệ - Bạn tận tụy, chu đáo và luôn quan tâm đến người khác.",
+    "careers": [
+      { "title": "Dược sĩ", "titleEn": "Pharmacist", "reason": "Chăm sóc sức khỏe tỉ mỉ" },
+      { "title": "Nhân viên hành chính", "titleEn": "Administrative Assistant", "reason": "Hỗ trợ tổ chức" },
+      { "title": "Thủ thư", "titleEn": "Librarian", "reason": "Phục vụ cộng đồng" },
+      { "title": "Chuyên viên chăm sóc khách hàng", "titleEn": "Customer Service", "reason": "Giúp đỡ người khác" },
+      { "title": "Nhà thiết kế nội thất", "titleEn": "Interior Designer", "reason": "Tạo không gian thoải mái" }
+    ]
+  },
+  "ESFP": {
+    "description": "Người giải trí - Bạn vui vẻ, nhiệt tình và thích làm trung tâm.",
+    "careers": [
+      { "title": "Diễn viên", "titleEn": "Actor", "reason": "Biểu diễn và giải trí" },
+      { "title": "Hướng dẫn viên du lịch", "titleEn": "Tour Guide", "reason": "Giao tiếp và khám phá" },
+      { "title": "Chuyên viên sự kiện", "titleEn": "Event Planner", "reason": "Tổ chức hoạt động vui vẻ" },
+      { "title": "Nhà thiết kế thời trang", "titleEn": "Fashion Designer", "reason": "Sáng tạo phong cách" },
+      { "title": "Nhân viên PR", "titleEn": "PR Specialist", "reason": "Xây dựng hình ảnh" }
+    ]
+  }
 }
