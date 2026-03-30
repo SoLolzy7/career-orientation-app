@@ -16,11 +16,11 @@ function App() {
   const [careersData, setCareersData] = useState({});
   const [dataLoaded, setDataLoaded] = useState(false);
   
-  // State for current question (always declared, even if not used in all steps)
+  // State for current question
   const [selectedScore, setSelectedScore] = useState(null);
   const [isAnswered, setIsAnswered] = useState(false);
 
-  // Fallback data
+  // Complete careers data for all 16 MBTI types
   const fallbackCareers = {
     'INTJ': {
       description: 'The Strategist - Strategic thinking, independent, problem solver',
@@ -38,8 +38,16 @@ function App() {
         { title: 'Philosopher', icon: '📚', reason: 'Deep thinking and abstract reasoning' }
       ]
     },
+    'ENTJ': {
+      description: 'The Commander - Bold, imaginative, strong-willed leader',
+      careers: [
+        { title: 'Executive Director', icon: '👔', reason: 'Natural leadership and strategic vision' },
+        { title: 'Management Consultant', icon: '📊', reason: 'Problem-solving and organizational skills' },
+        { title: 'Entrepreneur', icon: '🚀', reason: 'Visionary thinking and determination' }
+      ]
+    },
     'ENTP': {
-      description: 'The Innovator - Creative, enjoys challenges, innovative',
+      description: 'The Debater - Creative, quick-witted, enjoys intellectual challenges',
       careers: [
         { title: 'Entrepreneur', icon: '🚀', reason: 'Innovation and risk-taking' },
         { title: 'Lawyer', icon: '⚖️', reason: 'Debate skills and logical reasoning' },
@@ -54,40 +62,56 @@ function App() {
         { title: 'Nonprofit Director', icon: '💝', reason: 'Vision and humanitarian values' }
       ]
     },
+    'INFP': {
+      description: 'The Mediator - Idealistic, creative, driven by strong values',
+      careers: [
+        { title: 'Psychologist', icon: '🧠', reason: 'Understanding human behavior' },
+        { title: 'Graphic Designer', icon: '🎨', reason: 'Creativity and self-expression' },
+        { title: 'Social Worker', icon: '🤝', reason: 'Helping others and making a difference' }
+      ]
+    },
+    'ENFJ': {
+      description: 'The Protagonist - Charismatic, inspiring, natural leader',
+      careers: [
+        { title: 'Teacher', icon: '📚', reason: 'Inspiring and guiding others' },
+        { title: 'HR Manager', icon: '👥', reason: 'Understanding and developing people' },
+        { title: 'Public Relations Specialist', icon: '📢', reason: 'Communication and relationship building' }
+      ]
+    },
     'ENFP': {
-      description: 'The Explorer - Creative, energetic, loves connections',
+      description: 'The Campaigner - Enthusiastic, creative, people-oriented',
       careers: [
         { title: 'Marketing Specialist', icon: '📱', reason: 'Creativity and communication' },
         { title: 'Event Planner', icon: '🎉', reason: 'Energy and organization' },
-        { title: 'Psychologist', icon: '🧠', reason: 'Understanding people' }
+        { title: 'Journalist', icon: '📰', reason: 'Curiosity and storytelling' }
       ]
     },
     'ISTJ': {
-      description: 'The Realist - Responsible, detail-oriented, systematic',
+      description: 'The Logistician - Practical, fact-minded, dependable',
       careers: [
         { title: 'Accountant', icon: '💰', reason: 'Attention to detail and accuracy' },
         { title: 'Project Manager', icon: '📋', reason: 'Organization and responsibility' },
         { title: 'Librarian', icon: '📖', reason: 'Systematic and detail-oriented' }
       ]
     },
-    'ESTJ': {
-      description: 'The Supervisor - Organized, decisive, practical',
-      careers: [
-        { title: 'Police Officer', icon: '👮', reason: 'Decisiveness and structure' },
-        { title: 'Operations Manager', icon: '🏭', reason: 'Efficiency and organization' },
-        { title: 'Judge', icon: '⚖️', reason: 'Decisiveness and fairness' }
-      ]
-    },
     'ISFJ': {
-      description: 'The Protector - Thoughtful, loyal, caring',
+      description: 'The Defender - Dedicated, warm-hearted, protective',
       careers: [
         { title: 'Pharmacist', icon: '💊', reason: 'Attention to detail and care' },
         { title: 'Social Worker', icon: '🤝', reason: 'Empathy and dedication' },
         { title: 'Administrative Assistant', icon: '📁', reason: 'Organization and reliability' }
       ]
     },
+    'ESTJ': {
+      description: 'The Executive - Efficient, organized, practical leader',
+      careers: [
+        { title: 'Police Officer', icon: '👮', reason: 'Decisiveness and structure' },
+        { title: 'Operations Manager', icon: '🏭', reason: 'Efficiency and organization' },
+        { title: 'Judge', icon: '⚖️', reason: 'Decisiveness and fairness' }
+      ]
+    },
     'ESFJ': {
-      description: 'The Caregiver - Devoted, helpful, community-oriented',
+      description: 'The Consul - Caring, social, community-oriented',
       careers: [
         { title: 'Teacher', icon: '📚', reason: 'Nurturing and communication' },
         { title: 'Nurse', icon: '🏥', reason: 'Caring and dedication' },
@@ -95,15 +119,23 @@ function App() {
       ]
     },
     'ISTP': {
-      description: 'The Craftsman - Skilled craftsmanship, flexible, practical',
+      description: 'The Virtuoso - Bold, practical, hands-on problem solver',
       careers: [
         { title: 'Mechanical Engineer', icon: '🔧', reason: 'Practical skills and problem-solving' },
         { title: 'Pilot', icon: '✈️', reason: 'Quick reflexes and technical skills' },
         { title: 'Forensic Analyst', icon: '🔍', reason: 'Attention to detail and analysis' }
       ]
     },
+    'ISFP': {
+      description: 'The Adventurer - Flexible, charming, artistic',
+      careers: [
+        { title: 'Artist', icon: '🎨', reason: 'Creative expression and aesthetics' },
+        { title: 'Musician', icon: '🎵', reason: 'Emotional expression through art' },
+        { title: 'Chef', icon: '🍳', reason: 'Hands-on creativity and sensory experience' }
+      ]
+    },
     'ESTP': {
-      description: 'The Doer - Action-oriented, pragmatic, risk-taker',
+      description: 'The Entrepreneur - Energetic, perceptive, risk-taker',
       careers: [
         { title: 'Real Estate Agent', icon: '🏠', reason: 'Energy and negotiation skills' },
         { title: 'Athlete', icon: '⚽', reason: 'Physical energy and competition' },
@@ -111,11 +143,11 @@ function App() {
       ]
     },
     'ESFP': {
-      description: 'The Performer - Lively, optimistic, enjoys being center of attention',
+      description: 'The Entertainer - Spontaneous, energetic, enthusiastic',
       careers: [
         { title: 'Actor', icon: '🎬', reason: 'Expression and charisma' },
         { title: 'Tour Guide', icon: '🗺️', reason: 'Energy and communication' },
-        { title: 'Childcare Worker', icon: '👶', reason: 'Playfulness and care' }
+        { title: 'Event Coordinator', icon: '🎪', reason: 'Creativity and people skills' }
       ]
     }
   };
@@ -174,6 +206,7 @@ function App() {
 
   // Calculate MBTI score based on sum scoring (threshold = 15)
   const calculatePersonality = (answers, questions) => {
+    // Initialize group scores
     const groupScores = {
       EI: 0,
       SN: 0,
@@ -181,6 +214,7 @@ function App() {
       JP: 0
     };
     
+    // Calculate total scores for each group
     answers.forEach(answer => {
       const question = questions.find(q => q.id === answer.questionId);
       if (question) {
@@ -190,12 +224,17 @@ function App() {
       }
     });
     
+    // Determine traits: Score > 15 → first trait, Score ≤ 15 → second trait
     const energy = groupScores.EI > 15 ? 'E' : 'I';
     const perception = groupScores.SN > 15 ? 'N' : 'S';
     const decision = groupScores.TF > 15 ? 'F' : 'T';
     const lifestyle = groupScores.JP > 15 ? 'P' : 'J';
     const type = energy + perception + decision + lifestyle;
     
+    console.log('Group scores:', groupScores);
+    console.log('Result type:', type);
+    
+    // Calculate percentage strength
     const calculatePercentage = (score) => {
       const deviation = Math.abs(score - 15);
       const maxDeviation = 10;
@@ -231,14 +270,22 @@ function App() {
       setLoading(true);
       setTimeout(() => {
         const personalityResult = calculatePersonality(answers, questionsData);
-        const careerData = careersData[personalityResult.type] || {
-          description: 'Your unique personality type',
-          careers: [
-            { title: 'Career Counselor', icon: '🎯', reason: 'Understanding of people' },
-            { title: 'Research Specialist', icon: '🔬', reason: 'Analytical thinking' },
-            { title: 'Content Creator', icon: '✍️', reason: 'Creative ideas' }
-          ]
-        };
+        
+        // Get career data, fallback if type not found
+        let careerData = careersData[personalityResult.type];
+        
+        if (!careerData) {
+          console.warn(`No career data for type: ${personalityResult.type}, using fallback`);
+          careerData = {
+            description: `${personalityResult.type} - Your unique personality type`,
+            careers: [
+              { title: 'Career Counselor', icon: '🎯', reason: 'Understanding of people' },
+              { title: 'Research Specialist', icon: '🔬', reason: 'Analytical thinking' },
+              { title: 'Content Creator', icon: '✍️', reason: 'Creative ideas' }
+            ]
+          };
+        }
+        
         setResult({
           ...personalityResult,
           careers: careerData
@@ -416,7 +463,15 @@ function App() {
     const currentQuestion = questionsData[currentQuestionIndex];
     const percentage = ((currentQuestionIndex + 1) / questionsData.length) * 100;
     
-    if (!currentQuestion) return null;
+    if (!currentQuestion) {
+      return (
+        <div className="container">
+          <div className="card" style={{ textAlign: 'center' }}>
+            <p>Loading questions...</p>
+          </div>
+        </div>
+      );
+    }
     
     return (
       <motion.div
@@ -439,7 +494,7 @@ function App() {
             {currentQuestion.text}
           </h2>
           <p style={{ color: 'var(--gray)', marginBottom: '1.5rem', fontStyle: 'italic' }}>
-            Rate how well this describes you (1 = Not at all, 5 = Describes me very well)
+            Rate how well this describes you
           </p>
           
           <div style={{ marginBottom: '2rem' }}>
