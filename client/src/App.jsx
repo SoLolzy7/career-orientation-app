@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { sendResultEmail } from './services/api';
+import CareerResults from './components/CareerResults';
 import './index.css';
 
 function App() {
@@ -16,9 +17,18 @@ function App() {
   const [careersData, setCareersData] = useState({});
   const [dataLoaded, setDataLoaded] = useState(false);
   
-  // State for current question
+  // State for current question (always declared at top)
   const [selectedScore, setSelectedScore] = useState(null);
   const [isAnswered, setIsAnswered] = useState(false);
+
+  // Score options for 1-5 scale
+  const scores = [
+    { value: 1, label: '1', text: 'Not at all', textEn: 'Does not describe me' },
+    { value: 2, label: '2', text: 'Slightly', textEn: 'Describes me a little' },
+    { value: 3, label: '3', text: 'Moderately', textEn: 'Describes me moderately' },
+    { value: 4, label: '4', text: 'Very much', textEn: 'Describes me well' },
+    { value: 5, label: '5', text: 'Extremely', textEn: 'Describes me very well' }
+  ];
 
   // Complete careers data for all 16 MBTI types
   const fallbackCareers = {
@@ -206,7 +216,6 @@ function App() {
 
   // Calculate MBTI score based on sum scoring (threshold = 15)
   const calculatePersonality = (answers, questions) => {
-    // Initialize group scores
     const groupScores = {
       EI: 0,
       SN: 0,
@@ -214,7 +223,6 @@ function App() {
       JP: 0
     };
     
-    // Calculate total scores for each group
     answers.forEach(answer => {
       const question = questions.find(q => q.id === answer.questionId);
       if (question) {
@@ -224,17 +232,16 @@ function App() {
       }
     });
     
-    // Determine traits: Score > 15 → first trait, Score ≤ 15 → second trait
+    console.log('Group scores:', groupScores);
+    
     const energy = groupScores.EI > 15 ? 'E' : 'I';
     const perception = groupScores.SN > 15 ? 'N' : 'S';
     const decision = groupScores.TF > 15 ? 'F' : 'T';
     const lifestyle = groupScores.JP > 15 ? 'P' : 'J';
     const type = energy + perception + decision + lifestyle;
     
-    console.log('Group scores:', groupScores);
     console.log('Result type:', type);
     
-    // Calculate percentage strength
     const calculatePercentage = (score) => {
       const deviation = Math.abs(score - 15);
       const maxDeviation = 10;
@@ -244,20 +251,28 @@ function App() {
     
     const percentages = {
       EI: { 
-        E: groupScores.EI, I: groupScores.EI, dominant: energy, 
-        percentage: calculatePercentage(groupScores.EI) 
+        E: calculatePercentage(groupScores.EI), 
+        I: 100 - calculatePercentage(groupScores.EI), 
+        dominant: energy,
+        score: groupScores.EI
       },
       SN: { 
-        S: groupScores.SN, N: groupScores.SN, dominant: perception, 
-        percentage: calculatePercentage(groupScores.SN) 
+        S: calculatePercentage(groupScores.SN), 
+        N: 100 - calculatePercentage(groupScores.SN), 
+        dominant: perception,
+        score: groupScores.SN
       },
       TF: { 
-        T: groupScores.TF, F: groupScores.TF, dominant: decision, 
-        percentage: calculatePercentage(groupScores.TF) 
+        T: calculatePercentage(groupScores.TF), 
+        F: 100 - calculatePercentage(groupScores.TF), 
+        dominant: decision,
+        score: groupScores.TF
       },
       JP: { 
-        J: groupScores.JP, P: groupScores.JP, dominant: lifestyle, 
-        percentage: calculatePercentage(groupScores.JP) 
+        J: calculatePercentage(groupScores.JP), 
+        P: 100 - calculatePercentage(groupScores.JP), 
+        dominant: lifestyle,
+        score: groupScores.JP
       }
     };
     
@@ -266,26 +281,25 @@ function App() {
 
   // Calculate results when questions are completed
   useEffect(() => {
+    console.log('Checking completion:', { 
+      step, 
+      answersLength: answers.length, 
+      totalQuestions: questionsData.length 
+    });
+    
     if (step === 'questions' && answers.length === questionsData.length && questionsData.length > 0) {
+      console.log('All questions answered! Calculating results...');
       setLoading(true);
       setTimeout(() => {
         const personalityResult = calculatePersonality(answers, questionsData);
-        
-        // Get career data, fallback if type not found
-        let careerData = careersData[personalityResult.type];
-        
-        if (!careerData) {
-          console.warn(`No career data for type: ${personalityResult.type}, using fallback`);
-          careerData = {
-            description: `${personalityResult.type} - Your unique personality type`,
-            careers: [
-              { title: 'Career Counselor', icon: '🎯', reason: 'Understanding of people' },
-              { title: 'Research Specialist', icon: '🔬', reason: 'Analytical thinking' },
-              { title: 'Content Creator', icon: '✍️', reason: 'Creative ideas' }
-            ]
-          };
-        }
-        
+        const careerData = careersData[personalityResult.type] || {
+          description: `${personalityResult.type} - Your unique personality type`,
+          careers: [
+            { title: 'Career Counselor', icon: '🎯', reason: 'Understanding of people' },
+            { title: 'Research Specialist', icon: '🔬', reason: 'Analytical thinking' },
+            { title: 'Content Creator', icon: '✍️', reason: 'Creative ideas' }
+          ]
+        };
         setResult({
           ...personalityResult,
           careers: careerData
@@ -328,12 +342,13 @@ function App() {
     setIsAnswered(true);
   };
   
-  // Handle next question
+  // Handle next question (when clicking next after answering)
   const handleNext = () => {
     if (currentQuestionIndex + 1 < questionsData.length) {
       setSelectedScore(null);
       setIsAnswered(false);
     }
+    // If it's the last question, the useEffect will trigger the result calculation
   };
 
   const handlePersonalInfoSubmit = (info) => {
@@ -379,15 +394,6 @@ function App() {
     setSelectedScore(null);
     setIsAnswered(false);
   };
-
-  // Score options for 1-5 scale
-  const scores = [
-    { value: 1, label: '1', text: 'Not at all', textEn: 'Does not describe me' },
-    { value: 2, label: '2', text: 'Slightly', textEn: 'Describes me a little' },
-    { value: 3, label: '3', text: 'Moderately', textEn: 'Describes me moderately' },
-    { value: 4, label: '4', text: 'Very much', textEn: 'Describes me well' },
-    { value: 5, label: '5', text: 'Extremely', textEn: 'Describes me very well' }
-  ];
 
   if (!dataLoaded) {
     return (
@@ -463,7 +469,7 @@ function App() {
     const currentQuestion = questionsData[currentQuestionIndex];
     const percentage = ((currentQuestionIndex + 1) / questionsData.length) * 100;
     
-    if (!currentQuestion) {
+    if (!currentQuestion || questionsData.length === 0) {
       return (
         <div className="container">
           <div className="card" style={{ textAlign: 'center' }}>
@@ -475,6 +481,7 @@ function App() {
     
     return (
       <motion.div
+        key={currentQuestionIndex}
         initial={{ opacity: 0, x: 50 }}
         animate={{ opacity: 1, x: 0 }}
         exit={{ opacity: 0, x: -50 }}
@@ -494,7 +501,7 @@ function App() {
             {currentQuestion.text}
           </h2>
           <p style={{ color: 'var(--gray)', marginBottom: '1.5rem', fontStyle: 'italic' }}>
-            Rate how well this describes you
+            Rate how well this describes you (1 = Not at all, 5 = Describes me very well)
           </p>
           
           <div style={{ marginBottom: '2rem' }}>
@@ -581,118 +588,17 @@ function App() {
       );
     }
     
-    const careerList = result.careers?.careers || [];
-    const traitPairs = [
-      { left: result.percentages.EI.E, right: result.percentages.EI.I, leftName: 'Extroversion (E)', rightName: 'Introversion (I)', dominant: result.percentages.EI.dominant, percentage: result.percentages.EI.percentage },
-      { left: result.percentages.SN.S, right: result.percentages.SN.N, leftName: 'Sensing (S)', rightName: 'Intuition (N)', dominant: result.percentages.SN.dominant, percentage: result.percentages.SN.percentage },
-      { left: result.percentages.TF.T, right: result.percentages.TF.F, leftName: 'Thinking (T)', rightName: 'Feeling (F)', dominant: result.percentages.TF.dominant, percentage: result.percentages.TF.percentage },
-      { left: result.percentages.JP.J, right: result.percentages.JP.P, leftName: 'Judging (J)', rightName: 'Perceiving (P)', dominant: result.percentages.JP.dominant, percentage: result.percentages.JP.percentage }
-    ];
-    
-    const getTraitName = (dominant, leftName, rightName) => {
-      if (dominant === 'E') return leftName.split('(')[0];
-      if (dominant === 'I') return rightName.split('(')[0];
-      if (dominant === 'S') return leftName.split('(')[0];
-      if (dominant === 'N') return rightName.split('(')[0];
-      if (dominant === 'T') return leftName.split('(')[0];
-      if (dominant === 'F') return rightName.split('(')[0];
-      if (dominant === 'J') return leftName.split('(')[0];
-      if (dominant === 'P') return rightName.split('(')[0];
-      return '';
-    };
-    
     return (
       <>
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="container"
-        >
-          <div className="card">
-            <h1 style={{ fontSize: '2rem', marginBottom: '0.5rem', textAlign: 'center' }}>
-              🎉 Your Results, {userInfo.name}!
-            </h1>
-            
-            <div style={{ textAlign: 'center', margin: '2rem 0' }}>
-              <div style={{ 
-                fontSize: '4rem', 
-                fontWeight: 'bold',
-                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                marginBottom: '0.5rem',
-                letterSpacing: '4px'
-              }}>
-                {result.type}
-              </div>
-              <p style={{ color: '#6b7280', fontSize: '1.1rem' }}>
-                {result.careers.description || 'Your unique personality type'}
-              </p>
-            </div>
-            
-            <h3>📊 Detailed Analysis</h3>
-            <div className="traits-grid">
-              {traitPairs.map((pair, idx) => (
-                <div key={idx} className="trait-card">
-                  <div className="trait-letter">{pair.dominant}</div>
-                  <div className="trait-name">
-                    {getTraitName(pair.dominant, pair.leftName, pair.rightName)}
-                  </div>
-                  <div style={{ marginTop: '0.5rem', fontSize: '0.875rem', fontWeight: 'bold', color: '#667eea' }}>
-                    {pair.percentage}%
-                  </div>
-                </div>
-              ))}
-            </div>
-            
-            <h3>💼 Recommended Careers</h3>
-            <ul className="career-list">
-              {careerList.length > 0 ? (
-                careerList.map((career, i) => (
-                  <motion.li
-                    key={i}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: i * 0.1 }}
-                    className="career-item"
-                  >
-                    <span className="career-icon">{career.icon || '💼'}</span>
-                    <div>
-                      <strong>{career.title || career}</strong>
-                      {career.reason && (
-                        <div style={{ fontSize: '0.875rem', color: '#6b7280', marginTop: '4px' }}>
-                          {career.reason}
-                        </div>
-                      )}
-                    </div>
-                  </motion.li>
-                ))
-              ) : (
-                <p style={{ textAlign: 'center', color: '#6b7280' }}>
-                  Updating career data...
-                </p>
-              )}
-            </ul>
-            
-            <div style={{ display: 'flex', gap: '1rem', marginTop: '2rem', flexWrap: 'wrap' }}>
-              <button 
-                onClick={handleSendEmail} 
-                className="btn btn-primary" 
-                disabled={loading}
-                style={{ flex: 1, minWidth: '180px' }}
-              >
-                {loading ? 'Sending...' : '📧 Send Results via Email'}
-              </button>
-              <button 
-                onClick={handleRestart} 
-                className="btn btn-secondary"
-                style={{ flex: 1, minWidth: '180px' }}
-              >
-                🔄 Take Test Again
-              </button>
-            </div>
-          </div>
-        </motion.div>
+        <CareerResults
+          name={userInfo.name}
+          personality={result.type}
+          careers={result.careers}
+          percentages={result.percentages}
+          onSendEmail={handleSendEmail}
+          loading={loading}
+          onRestart={handleRestart}
+        />
         
         {toast && (
           <div className={`toast toast-${toast.type}`}>
