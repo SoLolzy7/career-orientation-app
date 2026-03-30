@@ -1,0 +1,42 @@
+[
+  {
+    "id": 1,
+    "text": "After a long week, how do you prefer to recharge?",
+    "options": [
+      { "value": "I", "text": "Spend time alone or with a close friend" },
+      { "value": "E", "text": "Go to a party or meet new people" }
+    ]
+  },
+  {
+    "id": 2,
+    "text": "When making a decision, you rely more on:",
+    "options": [
+      { "value": "S", "text": "Facts and practical details" },
+      { "value": "N", "text": "Your intuition and big‑picture ideas" }
+    ]
+  },
+  {
+    "id": 3,
+    "text": "Do you prefer to follow a plan or go with the flow?",
+    "options": [
+      { "value": "J", "text": "Follow a detailed schedule" },
+      { "value": "P", "text": "Keep options open and adapt" }
+    ]
+  },
+  {
+    "id": 4,
+    "text": "When working on a project, you focus more on:",
+    "options": [
+      { "value": "T", "text": "Logic and objective analysis" },
+      { "value": "F", "text": "People's feelings and harmony" }
+    ]
+  },
+  {
+    "id": 5,
+    "text": "Which environment suits you best?",
+    "options": [
+      { "value": "S", "text": "Structured, predictable environments" },
+      { "value": "N", "text": "Creative, exploratory spaces" }
+    ]
+  }
+]

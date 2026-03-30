@@ -1,0 +1,11 @@
+{
+  "name": "career-orientation-app",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "vercel dev"
+  },
+  "devDependencies": {
+    "vercel": "^32.0.0"
+  }
+}

@@ -1,0 +1,16 @@
+# Dependencies
+node_modules
+client/node_modules
+
+# Build output
+client/dist
+client/.vite
+
+# Environment variables
+.env
+
+# Vercel
+.vercel
+
+# OS
+.DS_Store
