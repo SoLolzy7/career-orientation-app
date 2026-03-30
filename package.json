@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "vercel dev"
+    "dev": "vercel dev",
+    "build": "cd client && npm run build",
+    "start": "vercel start"
   },
   "devDependencies": {
     "vercel": "^32.0.0"
