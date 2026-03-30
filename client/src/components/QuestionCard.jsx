@@ -1,46 +1,79 @@
-import { motion } from 'framer-motion';
+import React, { useState } from 'react';
+import './QuestionCard.css';
 
-function QuestionCard({ question, options, onAnswer, currentIndex, total }) {
-  const percentage = ((currentIndex + 1) / total) * 100;
-  
+const QuestionCard = ({ question, currentIndex, totalQuestions, onAnswer, onNext }) => {
+  const [selectedAnswer, setSelectedAnswer] = useState(null);
+  const [isAnswered, setIsAnswered] = useState(false);
+
+  const handleAnswerSelect = (answer) => {
+    if (isAnswered) return;
+    setSelectedAnswer(answer);
+  };
+
+  const handleSubmit = () => {
+    if (selectedAnswer === null) return;
+    setIsAnswered(true);
+    onAnswer(selectedAnswer);
+  };
+
+  const handleNext = () => {
+    setSelectedAnswer(null);
+    setIsAnswered(false);
+    onNext();
+  };
+
   return (
-    <motion.div
-      initial={{ opacity: 0, x: 50 }}
-      animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: -50 }}
-      transition={{ duration: 0.3 }}
-      className="container"
-    >
-      <div className="card">
-        <div className="progress-container">
-          <div className="progress-bar">
-            <div className="progress-fill" style={{ width: `${percentage}%` }}></div>
-          </div>
-          <div className="progress-text">
-            Câu {currentIndex + 1} / {total}
-          </div>
+    <div className="question-card">
+      <div className="progress-section">
+        <div className="question-counter">
+          Câu hỏi {currentIndex + 1}/{totalQuestions}
         </div>
-        
-        <h2 style={{ fontSize: '1.5rem', marginBottom: '1rem', minHeight: '100px' }}>
-          {question}
-        </h2>
-        
-        <div className="options-grid">
-          {options.map((opt, idx) => (
-            <motion.button
-              key={idx}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              className="option-btn"
-              onClick={() => onAnswer(opt.value)}
-            >
-              {opt.text}
-            </motion.button>
-          ))}
+        <div className="progress-bar">
+          <div 
+            className="progress-fill" 
+            style={{ width: `${((currentIndex + 1) / totalQuestions) * 100}%` }}
+          ></div>
         </div>
       </div>
-    </motion.div>
+
+      <div className="question-content">
+        <h2 className="question-text">{question.text}</h2>
+        
+        <div className="options-container">
+          {question.options.map((option, index) => (
+            <div
+              key={index}
+              className={`option-card ${selectedAnswer === index ? 'selected' : ''} ${isAnswered ? 'disabled' : ''}`}
+              onClick={() => handleAnswerSelect(index)}
+            >
+              <div className="option-letter">
+                {String.fromCharCode(65 + index)}
+              </div>
+              <div className="option-text">
+                {option}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="action-buttons">
+          {!isAnswered ? (
+            <button 
+              className="btn-submit" 
+              onClick={handleSubmit}
+              disabled={selectedAnswer === null}
+            >
+              Xác nhận câu trả lời
+            </button>
+          ) : (
+            <button className="btn-next" onClick={handleNext}>
+              {currentIndex + 1 === totalQuestions ? 'Xem kết quả' : 'Câu hỏi tiếp theo'}
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
   );
-}
+};
 
 export default QuestionCard;
