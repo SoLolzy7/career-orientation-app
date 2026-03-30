@@ -4,6 +4,7 @@ import { sendResultEmail } from './services/api';
 import './index.css';
 
 function App() {
+  // ==================== ALL HOOKS AT TOP ====================
   const [step, setStep] = useState('personal');
   const [userInfo, setUserInfo] = useState({ name: '', email: '' });
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -14,6 +15,10 @@ function App() {
   const [questionsData, setQuestionsData] = useState([]);
   const [careersData, setCareersData] = useState({});
   const [dataLoaded, setDataLoaded] = useState(false);
+  
+  // State for current question (always declared, even if not used in all steps)
+  const [selectedScore, setSelectedScore] = useState(null);
+  const [isAnswered, setIsAnswered] = useState(false);
 
   // Fallback data
   const fallbackCareers = {
@@ -169,35 +174,31 @@ function App() {
 
   // Calculate MBTI score based on sum scoring (threshold = 15)
   const calculatePersonality = (answers, questions) => {
-    // Initialize group scores
     const groupScores = {
-      EI: 0,  // Extroversion vs Introversion
-      SN: 0,  // Intuition vs Sensing
-      TF: 0,  // Feeling vs Thinking
-      JP: 0   // Perceiving vs Judging
+      EI: 0,
+      SN: 0,
+      TF: 0,
+      JP: 0
     };
     
-    // Calculate total scores for each group
     answers.forEach(answer => {
       const question = questions.find(q => q.id === answer.questionId);
       if (question) {
         const group = question.group;
-        const score = answer.value; // Value from 1-5
+        const score = answer.value;
         groupScores[group] += score;
       }
     });
     
-    // Determine traits: Score > 15 → first trait, Score ≤ 15 → second trait
     const energy = groupScores.EI > 15 ? 'E' : 'I';
     const perception = groupScores.SN > 15 ? 'N' : 'S';
     const decision = groupScores.TF > 15 ? 'F' : 'T';
     const lifestyle = groupScores.JP > 15 ? 'P' : 'J';
     const type = energy + perception + decision + lifestyle;
     
-    // Calculate percentage strength
     const calculatePercentage = (score) => {
       const deviation = Math.abs(score - 15);
-      const maxDeviation = 10; // 25 - 15 = 10
+      const maxDeviation = 10;
       const percentage = Math.round((deviation / maxDeviation) * 100);
       return Math.min(percentage, 100);
     };
@@ -258,6 +259,33 @@ function App() {
 
     if (currentQuestionIndex + 1 < questionsData.length) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
+      // Reset question state for next question
+      setSelectedScore(null);
+      setIsAnswered(false);
+    }
+  };
+  
+  // Handle score selection for current question
+  const handleScoreSelect = (score) => {
+    if (isAnswered) return;
+    setSelectedScore(score);
+  };
+  
+  // Handle submit for current question
+  const handleSubmit = () => {
+    if (selectedScore === null) {
+      alert('Please select a rating (1-5)');
+      return;
+    }
+    handleAnswer(selectedScore);
+    setIsAnswered(true);
+  };
+  
+  // Handle next question
+  const handleNext = () => {
+    if (currentQuestionIndex + 1 < questionsData.length) {
+      setSelectedScore(null);
+      setIsAnswered(false);
     }
   };
 
@@ -301,7 +329,18 @@ function App() {
     setAnswers([]);
     setResult(null);
     setUserInfo({ name: '', email: '' });
+    setSelectedScore(null);
+    setIsAnswered(false);
   };
+
+  // Score options for 1-5 scale
+  const scores = [
+    { value: 1, label: '1', text: 'Not at all', textEn: 'Does not describe me' },
+    { value: 2, label: '2', text: 'Slightly', textEn: 'Describes me a little' },
+    { value: 3, label: '3', text: 'Moderately', textEn: 'Describes me moderately' },
+    { value: 4, label: '4', text: 'Very much', textEn: 'Describes me well' },
+    { value: 5, label: '5', text: 'Extremely', textEn: 'Describes me very well' }
+  ];
 
   if (!dataLoaded) {
     return (
@@ -314,7 +353,7 @@ function App() {
     );
   }
 
-  // Personal Information Form
+  // ==================== PERSONAL INFO FORM ====================
   if (step === 'personal') {
     return (
       <motion.div
@@ -372,40 +411,10 @@ function App() {
     );
   }
 
-  // Questions with 1-5 scale
+  // ==================== QUESTIONS (1-5 SCALE) ====================
   if (step === 'questions') {
     const currentQuestion = questionsData[currentQuestionIndex];
     const percentage = ((currentQuestionIndex + 1) / questionsData.length) * 100;
-    
-    const scores = [
-      { value: 1, label: '1', text: 'Not at all', textEn: 'Does not describe me' },
-      { value: 2, label: '2', text: 'Slightly', textEn: 'Describes me a little' },
-      { value: 3, label: '3', text: 'Moderately', textEn: 'Describes me moderately' },
-      { value: 4, label: '4', text: 'Very much', textEn: 'Describes me well' },
-      { value: 5, label: '5', text: 'Extremely', textEn: 'Describes me very well' }
-    ];
-    
-    const [selectedScore, setSelectedScore] = useState(null);
-    const [isAnswered, setIsAnswered] = useState(false);
-    
-    const handleScoreSelect = (score) => {
-      if (isAnswered) return;
-      setSelectedScore(score);
-    };
-    
-    const handleSubmit = () => {
-      if (selectedScore === null) {
-        alert('Please select a rating (1-5)');
-        return;
-      }
-      handleAnswer(selectedScore);
-      setIsAnswered(true);
-    };
-    
-    const handleNext = () => {
-      setIsAnswered(false);
-      setSelectedScore(null);
-    };
     
     if (!currentQuestion) return null;
     
@@ -430,12 +439,12 @@ function App() {
             {currentQuestion.text}
           </h2>
           <p style={{ color: 'var(--gray)', marginBottom: '1.5rem', fontStyle: 'italic' }}>
-            {currentQuestion.description}
+            Rate how well this describes you (1 = Not at all, 5 = Describes me very well)
           </p>
           
           <div style={{ marginBottom: '2rem' }}>
             <p style={{ marginBottom: '1rem', fontWeight: 'bold', textAlign: 'center' }}>
-              Rate how well this describes you (1 = Not at all, 5 = Describes me very well):
+              Rate how well this describes you:
             </p>
             <div style={{ display: 'flex', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap' }}>
               {scores.map((score) => (
@@ -504,7 +513,7 @@ function App() {
     );
   }
 
-  // Results Page
+  // ==================== RESULTS ====================
   if (step === 'results') {
     if (loading || !result) {
       return (
