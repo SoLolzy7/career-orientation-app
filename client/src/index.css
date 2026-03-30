@@ -281,3 +281,82 @@ input:focus {
     grid-template-columns: 1fr;
   }
 }
+
+/* Score buttons for 1-5 scale */
+.score-grid {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: 1rem 0;
+  flex-wrap: wrap;
+}
+
+.score-btn {
+  flex: 1;
+  min-width: 80px;
+  padding: 1rem;
+  background: var(--light);
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+}
+
+.score-btn:hover:not(:disabled) {
+  border-color: var(--primary);
+  transform: translateY(-3px);
+  box-shadow: var(--shadow);
+}
+
+.score-btn.selected {
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  border-color: var(--primary);
+  color: white;
+}
+
+.score-btn.selected .score-label,
+.score-btn.selected .score-label-en {
+  color: white;
+}
+
+.score-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.score-number {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 0.25rem;
+}
+
+.score-label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--dark);
+}
+
+.score-label-en {
+  font-size: 0.7rem;
+  color: var(--gray);
+}
+
+@media (max-width: 640px) {
+  .score-grid {
+    gap: 0.5rem;
+  }
+  
+  .score-btn {
+    min-width: 60px;
+    padding: 0.75rem;
+  }
+  
+  .score-number {
+    font-size: 1.2rem;
+  }
+  
+  .score-label {
+    font-size: 0.65rem;
+  }
+}

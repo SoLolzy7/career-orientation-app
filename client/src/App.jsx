@@ -344,18 +344,32 @@ function App() {
   };
 
   // Xử lý chọn đáp án
-  const handleAnswer = (answerValue) => {
-    const newAnswer = {
-      questionId: questionsData[currentQuestionIndex].id,
-      value: answerValue
-    };
-    const newAnswers = [...answers, newAnswer];
-    setAnswers(newAnswers);
-
-    if (currentQuestionIndex + 1 < questionsData.length) {
-      setCurrentQuestionIndex(currentQuestionIndex + 1);
-    }
+const handleAnswer = (score) => {
+  const newAnswer = {
+    questionId: questionsData[currentQuestionIndex].id,
+    value: score,  // score từ 1-5
+    group: questionsData[currentQuestionIndex].group
   };
+  setAnswers([...answers, newAnswer]);
+
+  if (currentQuestionIndex + 1 < questionsData.length) {
+    setCurrentQuestionIndex(currentQuestionIndex + 1);
+  }
+};
+
+// Cập nhật phần render QuestionCard
+if (step === 'questions') {
+  const currentQuestion = questionsData[currentQuestionIndex];
+  return (
+    <QuestionCard
+      question={currentQuestion.text}
+      description={currentQuestion.description}
+      onAnswer={handleAnswer}
+      currentIndex={currentQuestionIndex}
+      total={questionsData.length}
+    />
+  );
+}
 
   // Gửi email qua EmailJS
   const handleSendEmail = async () => {
