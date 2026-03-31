@@ -6,14 +6,6 @@
 export function calculatePersonality(answers, questions) {
   // Initialize scores for each group
   const groupScores = {
-    EI: 0,  // Extroversion vs Introversion
-    SN: 0,  // Intuition vs Sensing
-    TF: 0,  // Feeling vs Thinking
-    JP: 0   // Perceiving vs Judging
-  };
-  
-  // Count questions per group
-  const groupCounts = {
     EI: 0,
     SN: 0,
     TF: 0,
@@ -25,16 +17,14 @@ export function calculatePersonality(answers, questions) {
     const question = questions.find(q => q.id === answer.questionId);
     if (question) {
       const group = question.group;
-      const score = answer.value; // Value from 1-5
-      
+      const score = answer.value;
       groupScores[group] += score;
-      groupCounts[group]++;
     }
   });
   
+  console.log('📊 Raw group scores:', groupScores);
+  
   // Determine traits based on threshold of 15
-  // Score > 15: leans toward E, N, F, P
-  // Score ≤ 15: leans toward I, S, T, J
   const energy = groupScores.EI > 15 ? 'E' : 'I';
   const perception = groupScores.SN > 15 ? 'N' : 'S';
   const decision = groupScores.TF > 15 ? 'F' : 'T';
@@ -42,98 +32,69 @@ export function calculatePersonality(answers, questions) {
   
   const type = energy + perception + decision + lifestyle;
   
-  // Calculate percentage strength (0-100) for the DOMINANT trait
+  console.log('🎯 Result type:', type);
+  
+  // Calculate percentage strength (0-100)
   const calculateStrengthPercentage = (score) => {
     // Score range: 5 to 25, threshold at 15
-    // Max deviation from threshold = 10 (25-15 or 15-5)
+    // Max deviation from threshold = 10
     const deviation = Math.abs(score - 15);
     const maxDeviation = 10;
-    const percentage = Math.round((deviation / maxDeviation) * 100);
-    return Math.min(percentage, 100);
+    let percentage = Math.round((deviation / maxDeviation) * 100);
+    // Ensure percentage is between 0 and 100
+    percentage = Math.min(100, Math.max(0, percentage));
+    return percentage;
   };
   
-  // For each pair, calculate the percentage for BOTH traits
-  // The sum of both percentages will always be 100%
-  const getEIPercentages = (score) => {
-    const strength = calculateStrengthPercentage(score);
-    if (score > 15) {
-      return { E: strength, I: 100 - strength };
-    } else {
-      return { E: 100 - strength, I: strength };
-    }
-  };
-  
-  const getSNPercentages = (score) => {
-    const strength = calculateStrengthPercentage(score);
-    if (score > 15) {
-      return { N: strength, S: 100 - strength };
-    } else {
-      return { N: 100 - strength, S: strength };
-    }
-  };
-  
-  const getTFPercentages = (score) => {
-    const strength = calculateStrengthPercentage(score);
-    if (score > 15) {
-      return { F: strength, T: 100 - strength };
-    } else {
-      return { F: 100 - strength, T: strength };
-    }
-  };
-  
-  const getJPPercentages = (score) => {
-    const strength = calculateStrengthPercentage(score);
-    if (score > 15) {
-      return { P: strength, J: 100 - strength };
-    } else {
-      return { P: 100 - strength, J: strength };
-    }
-  };
-  
-  const eiPct = getEIPercentages(groupScores.EI);
-  const snPct = getSNPercentages(groupScores.SN);
-  const tfPct = getTFPercentages(groupScores.TF);
-  const jpPct = getJPPercentages(groupScores.JP);
+  // Calculate percentages for each pair
+  // The dominant trait gets the strength percentage, the other gets 100 - strength
+  const eiStrength = calculateStrengthPercentage(groupScores.EI);
+  const snStrength = calculateStrengthPercentage(groupScores.SN);
+  const tfStrength = calculateStrengthPercentage(groupScores.TF);
+  const jpStrength = calculateStrengthPercentage(groupScores.JP);
   
   const percentages = {
     EI: {
-      E: eiPct.E,
-      I: eiPct.I,
+      E: groupScores.EI > 15 ? eiStrength : 100 - eiStrength,
+      I: groupScores.EI <= 15 ? eiStrength : 100 - eiStrength,
       dominant: energy,
-      percentage: calculateStrengthPercentage(groupScores.EI),
-      score: groupScores.EI
+      strength: eiStrength,
+      rawScore: groupScores.EI
     },
     SN: {
-      S: snPct.S,
-      N: snPct.N,
+      S: groupScores.SN <= 15 ? snStrength : 100 - snStrength,
+      N: groupScores.SN > 15 ? snStrength : 100 - snStrength,
       dominant: perception,
-      percentage: calculateStrengthPercentage(groupScores.SN),
-      score: groupScores.SN
+      strength: snStrength,
+      rawScore: groupScores.SN
     },
     TF: {
-      T: tfPct.T,
-      F: tfPct.F,
+      T: groupScores.TF <= 15 ? tfStrength : 100 - tfStrength,
+      F: groupScores.TF > 15 ? tfStrength : 100 - tfStrength,
       dominant: decision,
-      percentage: calculateStrengthPercentage(groupScores.TF),
-      score: groupScores.TF
+      strength: tfStrength,
+      rawScore: groupScores.TF
     },
     JP: {
-      J: jpPct.J,
-      P: jpPct.P,
+      J: groupScores.JP <= 15 ? jpStrength : 100 - jpStrength,
+      P: groupScores.JP > 15 ? jpStrength : 100 - jpStrength,
       dominant: lifestyle,
-      percentage: calculateStrengthPercentage(groupScores.JP),
-      score: groupScores.JP
+      strength: jpStrength,
+      rawScore: groupScores.JP
     }
   };
   
-  console.log('Calculated percentages:', percentages);
+  console.log('📈 Percentages:', {
+    EI: `E: ${percentages.EI.E}%, I: ${percentages.EI.I}%`,
+    SN: `S: ${percentages.SN.S}%, N: ${percentages.SN.N}%`,
+    TF: `T: ${percentages.TF.T}%, F: ${percentages.TF.F}%`,
+    JP: `J: ${percentages.JP.J}%, P: ${percentages.JP.P}%`
+  });
   
   return { 
     type, 
-    scores: groupScores, 
-    percentages,
     rawScores: groupScores,
-    groupCounts
+    percentages
   };
 }
 
@@ -202,11 +163,11 @@ export function getPersonalityDetails(type, careersData) {
       strengths: ['Logical', 'Analytical', 'Creative']
     },
     ENTJ: {
-      core: 'The Leader - Decisive, strategic, organized',
+      core: 'The Commander - Bold, imaginative, strong-willed leader',
       strengths: ['Leadership', 'Strategic', 'Decisive']
     },
     ENTP: {
-      core: 'The Innovator - Creative, enjoys debate, innovative',
+      core: 'The Debater - Creative, quick-witted, enjoys intellectual challenges',
       strengths: ['Creative', 'Flexible', 'Negotiation']
     },
     INFJ: {
@@ -214,47 +175,47 @@ export function getPersonalityDetails(type, careersData) {
       strengths: ['Understanding', 'Vision', 'Patient']
     },
     INFP: {
-      core: 'The Idealist - Creative, authentic, empathetic',
+      core: 'The Mediator - Idealistic, creative, driven by strong values',
       strengths: ['Creative', 'Authentic', 'Empathetic']
     },
     ENFJ: {
-      core: 'The Mentor - Enthusiastic, connecting, inspiring',
+      core: 'The Protagonist - Charismatic, inspiring, natural leader',
       strengths: ['Communication', 'Leadership', 'Understanding']
     },
     ENFP: {
-      core: 'The Explorer - Creative, energetic, loves connections',
+      core: 'The Campaigner - Enthusiastic, creative, people-oriented',
       strengths: ['Creative', 'Enthusiastic', 'Flexible']
     },
     ISTJ: {
-      core: 'The Realist - Responsible, detail-oriented, systematic',
+      core: 'The Logistician - Practical, fact-minded, dependable',
       strengths: ['Responsible', 'Detail-oriented', 'Reliable']
     },
     ISFJ: {
-      core: 'The Protector - Dedicated, thoughtful, caring',
+      core: 'The Defender - Dedicated, warm-hearted, protective',
       strengths: ['Thoughtful', 'Dedicated', 'Patient']
     },
     ESTJ: {
-      core: 'The Supervisor - Practical, efficient, organized',
+      core: 'The Executive - Efficient, organized, practical leader',
       strengths: ['Organized', 'Decisive', 'Efficient']
     },
     ESFJ: {
-      core: 'The Caregiver - Warm, caring, community builder',
+      core: 'The Consul - Caring, social, community-oriented',
       strengths: ['Caring', 'Social', 'Responsible']
     },
     ISTP: {
-      core: 'The Craftsman - Skilled, practical, problem solver',
+      core: 'The Virtuoso - Bold, practical, hands-on problem solver',
       strengths: ['Skilled', 'Practical', 'Problem solver']
     },
     ISFP: {
-      core: 'The Artist - Sensitive, creative, appreciates beauty',
+      core: 'The Adventurer - Flexible, charming, artistic',
       strengths: ['Creative', 'Sensitive', 'Authentic']
     },
     ESTP: {
-      core: 'The Doer - Action-oriented, pragmatic, risk-taker',
+      core: 'The Entrepreneur - Energetic, perceptive, risk-taker',
       strengths: ['Energetic', 'Practical', 'Decisive']
     },
     ESFP: {
-      core: 'The Performer - Lively, optimistic, enjoys being center of attention',
+      core: 'The Entertainer - Spontaneous, energetic, enthusiastic',
       strengths: ['Energetic', 'Enthusiastic', 'Flexible']
     }
   };
