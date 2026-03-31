@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { sendResultEmail } from './services/api';
+import { calculatePersonality } from './scoring';
 import './index.css';
 
 function App() {
@@ -18,7 +19,6 @@ function App() {
   
   // State for current question
   const [selectedScore, setSelectedScore] = useState(null);
-  const [isAnswered, setIsAnswered] = useState(false);
 
   // Score options for 1-5 scale
   const scores = [
@@ -177,7 +177,6 @@ function App() {
             console.log('Successfully loaded questions.json');
           } else {
             console.warn('questions.json not found, using fallback');
-            // Use empty array - we'll handle empty questions
           }
         } catch (e) {
           console.warn('Error loading questions.json:', e);
@@ -214,84 +213,6 @@ function App() {
     setTimeout(() => setToast(null), 3000);
   };
 
-  // Calculate MBTI score based on sum scoring (threshold = 15)
-
-const calculatePersonality = (answers, questions) => {
-  const groupScores = {
-    EI: 0,
-    SN: 0,
-    TF: 0,
-    JP: 0
-  };
-  
-  answers.forEach(answer => {
-    const question = questions.find(q => q.id === answer.questionId);
-    if (question) {
-      const group = question.group;
-      const score = answer.value;
-      groupScores[group] += score;
-    }
-  });
-  
-  console.log('Group scores:', groupScores);
-  
-  // Determine traits: Score > 15 → first trait, Score ≤ 15 → second trait
-  const energy = groupScores.EI > 15 ? 'E' : 'I';
-  const perception = groupScores.SN > 15 ? 'N' : 'S';
-  const decision = groupScores.TF > 15 ? 'F' : 'T';
-  const lifestyle = groupScores.JP > 15 ? 'P' : 'J';
-  const type = energy + perception + decision + lifestyle;
-  
-  console.log('Result type:', type);
-  
-  // Calculate percentage for EACH trait (how strong the preference is)
-  const calculatePercentage = (score) => {
-    // Score range: 5 to 25, threshold at 15
-    // If score > 15, percentage = (score - 15) / 10 * 100
-    // If score <= 15, percentage = (15 - score) / 10 * 100
-    const deviation = Math.abs(score - 15);
-    const maxDeviation = 10; // 25 - 15 = 10
-    const percentage = Math.round((deviation / maxDeviation) * 100);
-    return Math.min(percentage, 100);
-  };
-  
-  // For the dominant trait, show the percentage strength
-  // For the opposite trait, show 100 - percentage
-  const getDominantPercentage = (score, isDominant) => {
-    const pct = calculatePercentage(score);
-    return isDominant ? pct : 100 - pct;
-  };
-  
-  const percentages = {
-    EI: { 
-      E: groupScores.EI > 15 ? calculatePercentage(groupScores.EI) : 100 - calculatePercentage(groupScores.EI),
-      I: groupScores.EI <= 15 ? calculatePercentage(groupScores.EI) : 100 - calculatePercentage(groupScores.EI),
-      dominant: energy,
-      score: groupScores.EI
-    },
-    SN: { 
-      S: groupScores.SN <= 15 ? calculatePercentage(groupScores.SN) : 100 - calculatePercentage(groupScores.SN),
-      N: groupScores.SN > 15 ? calculatePercentage(groupScores.SN) : 100 - calculatePercentage(groupScores.SN),
-      dominant: perception,
-      score: groupScores.SN
-    },
-    TF: { 
-      T: groupScores.TF <= 15 ? calculatePercentage(groupScores.TF) : 100 - calculatePercentage(groupScores.TF),
-      F: groupScores.TF > 15 ? calculatePercentage(groupScores.TF) : 100 - calculatePercentage(groupScores.TF),
-      dominant: decision,
-      score: groupScores.TF
-    },
-    JP: { 
-      J: groupScores.JP <= 15 ? calculatePercentage(groupScores.JP) : 100 - calculatePercentage(groupScores.JP),
-      P: groupScores.JP > 15 ? calculatePercentage(groupScores.JP) : 100 - calculatePercentage(groupScores.JP),
-      dominant: lifestyle,
-      score: groupScores.JP
-    }
-  };
-  
-  return { type, scores: groupScores, percentages };
-};
-
   // Calculate results when questions are completed
   useEffect(() => {
     console.log('Checking completion:', { 
@@ -304,6 +225,7 @@ const calculatePersonality = (answers, questions) => {
       console.log('All questions answered! Calculating results...');
       setLoading(true);
       setTimeout(() => {
+        // Use the imported calculatePersonality from scoring.js
         const personalityResult = calculatePersonality(answers, questionsData);
         const careerData = careersData[personalityResult.type] || {
           description: `${personalityResult.type} - Your unique personality type`,
@@ -337,11 +259,6 @@ const calculatePersonality = (answers, questions) => {
     if (currentQuestionIndex + 1 < questionsData.length) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
       setSelectedScore(null);
-      setIsAnswered(false);
-    } else {
-      // If this is the last question, mark as answered and let useEffect handle results
-      setIsAnswered(true);
-      // The useEffect will trigger when answers length equals questions length
     }
   };
   
@@ -353,17 +270,15 @@ const calculatePersonality = (answers, questions) => {
       setAnswers(newAnswers);
       setCurrentQuestionIndex(currentQuestionIndex - 1);
       setSelectedScore(null);
-      setIsAnswered(false);
     }
   };
   
   // Handle score selection for current question
   const handleScoreSelect = (score) => {
-    if (isAnswered) return;
     setSelectedScore(score);
   };
   
-  // Handle submit for current question - NOW AUTO GOES TO NEXT
+  // Handle submit for current question - AUTO GOES TO NEXT
   const handleSubmit = () => {
     if (selectedScore === null) {
       alert('Please select a rating (1-5)');
@@ -413,7 +328,6 @@ const calculatePersonality = (answers, questions) => {
     setResult(null);
     setUserInfo({ name: '', email: '' });
     setSelectedScore(null);
-    setIsAnswered(false);
   };
 
   if (!dataLoaded) {
@@ -642,10 +556,38 @@ const calculatePersonality = (answers, questions) => {
     
     const careerList = result.careers?.careers || [];
     const traitPairs = [
-      { left: result.percentages.EI.E, right: result.percentages.EI.I, leftName: 'Extroversion (E)', rightName: 'Introversion (I)', dominant: result.percentages.EI.dominant, percentage: result.percentages.EI.percentage },
-      { left: result.percentages.SN.S, right: result.percentages.SN.N, leftName: 'Sensing (S)', rightName: 'Intuition (N)', dominant: result.percentages.SN.dominant, percentage: result.percentages.SN.percentage },
-      { left: result.percentages.TF.T, right: result.percentages.TF.F, leftName: 'Thinking (T)', rightName: 'Feeling (F)', dominant: result.percentages.TF.dominant, percentage: result.percentages.TF.percentage },
-      { left: result.percentages.JP.J, right: result.percentages.JP.P, leftName: 'Judging (J)', rightName: 'Perceiving (P)', dominant: result.percentages.JP.dominant, percentage: result.percentages.JP.percentage }
+      { 
+        left: result.percentages.EI.E, 
+        right: result.percentages.EI.I, 
+        leftName: 'Extroversion (E)', 
+        rightName: 'Introversion (I)', 
+        dominant: result.percentages.EI.dominant,
+        percentage: result.percentages.EI.percentage
+      },
+      { 
+        left: result.percentages.SN.S, 
+        right: result.percentages.SN.N, 
+        leftName: 'Sensing (S)', 
+        rightName: 'Intuition (N)', 
+        dominant: result.percentages.SN.dominant,
+        percentage: result.percentages.SN.percentage
+      },
+      { 
+        left: result.percentages.TF.T, 
+        right: result.percentages.TF.F, 
+        leftName: 'Thinking (T)', 
+        rightName: 'Feeling (F)', 
+        dominant: result.percentages.TF.dominant,
+        percentage: result.percentages.TF.percentage
+      },
+      { 
+        left: result.percentages.JP.J, 
+        right: result.percentages.JP.P, 
+        leftName: 'Judging (J)', 
+        rightName: 'Perceiving (P)', 
+        dominant: result.percentages.JP.dominant,
+        percentage: result.percentages.JP.percentage
+      }
     ];
     
     const getTraitName = (dominant, leftName, rightName) => {
@@ -658,6 +600,18 @@ const calculatePersonality = (answers, questions) => {
       if (dominant === 'J') return leftName.split('(')[0];
       if (dominant === 'P') return rightName.split('(')[0];
       return '';
+    };
+    
+    const getDisplayValue = (pair) => {
+      if (pair.dominant === 'E') return pair.left;
+      if (pair.dominant === 'I') return pair.right;
+      if (pair.dominant === 'S') return pair.left;
+      if (pair.dominant === 'N') return pair.right;
+      if (pair.dominant === 'T') return pair.left;
+      if (pair.dominant === 'F') return pair.right;
+      if (pair.dominant === 'J') return pair.left;
+      if (pair.dominant === 'P') return pair.right;
+      return 0;
     };
     
     return (
@@ -698,7 +652,7 @@ const calculatePersonality = (answers, questions) => {
                     {getTraitName(pair.dominant, pair.leftName, pair.rightName)}
                   </div>
                   <div style={{ marginTop: '0.5rem', fontSize: '0.875rem', fontWeight: 'bold', color: '#667eea' }}>
-                    {pair.percentage}%
+                    {getDisplayValue(pair)}%
                   </div>
                 </div>
               ))}
