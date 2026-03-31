@@ -1,10 +1,9 @@
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { sendResultEmail } from './services/api';
 import './index.css';
 
 function App() {
-  // ==================== ALL HOOKS AT TOP ====================
   const [step, setStep] = useState('personal');
   const [userInfo, setUserInfo] = useState({ name: '', email: '' });
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -15,21 +14,8 @@ function App() {
   const [questionsData, setQuestionsData] = useState([]);
   const [careersData, setCareersData] = useState({});
   const [dataLoaded, setDataLoaded] = useState(false);
-  
-  // State for current question
-  const [selectedScore, setSelectedScore] = useState(null);
-  const [isAnswered, setIsAnswered] = useState(false);
 
-  // Score options for 1-5 scale
-  const scores = [
-    { value: 1, label: '1', text: 'Not at all', textEn: 'Does not describe me' },
-    { value: 2, label: '2', text: 'Slightly', textEn: 'Describes me a little' },
-    { value: 3, label: '3', text: 'Moderately', textEn: 'Describes me moderately' },
-    { value: 4, label: '4', text: 'Very much', textEn: 'Describes me well' },
-    { value: 5, label: '5', text: 'Extremely', textEn: 'Describes me very well' }
-  ];
-
-  // Complete careers data for all 16 MBTI types
+  // Fallback data
   const fallbackCareers = {
     'INTJ': {
       description: 'The Strategist - Strategic thinking, independent, problem solver',
@@ -47,16 +33,8 @@ function App() {
         { title: 'Philosopher', icon: '📚', reason: 'Deep thinking and abstract reasoning' }
       ]
     },
-    'ENTJ': {
-      description: 'The Commander - Bold, imaginative, strong-willed leader',
-      careers: [
-        { title: 'Executive Director', icon: '👔', reason: 'Natural leadership and strategic vision' },
-        { title: 'Management Consultant', icon: '📊', reason: 'Problem-solving and organizational skills' },
-        { title: 'Entrepreneur', icon: '🚀', reason: 'Visionary thinking and determination' }
-      ]
-    },
     'ENTP': {
-      description: 'The Debater - Creative, quick-witted, enjoys intellectual challenges',
+      description: 'The Innovator - Creative, enjoys challenges, innovative',
       careers: [
         { title: 'Entrepreneur', icon: '🚀', reason: 'Innovation and risk-taking' },
         { title: 'Lawyer', icon: '⚖️', reason: 'Debate skills and logical reasoning' },
@@ -71,56 +49,40 @@ function App() {
         { title: 'Nonprofit Director', icon: '💝', reason: 'Vision and humanitarian values' }
       ]
     },
-    'INFP': {
-      description: 'The Mediator - Idealistic, creative, driven by strong values',
-      careers: [
-        { title: 'Psychologist', icon: '🧠', reason: 'Understanding human behavior' },
-        { title: 'Graphic Designer', icon: '🎨', reason: 'Creativity and self-expression' },
-        { title: 'Social Worker', icon: '🤝', reason: 'Helping others and making a difference' }
-      ]
-    },
-    'ENFJ': {
-      description: 'The Protagonist - Charismatic, inspiring, natural leader',
-      careers: [
-        { title: 'Teacher', icon: '📚', reason: 'Inspiring and guiding others' },
-        { title: 'HR Manager', icon: '👥', reason: 'Understanding and developing people' },
-        { title: 'Public Relations Specialist', icon: '📢', reason: 'Communication and relationship building' }
-      ]
-    },
     'ENFP': {
-      description: 'The Campaigner - Enthusiastic, creative, people-oriented',
+      description: 'The Explorer - Creative, energetic, loves connections',
       careers: [
         { title: 'Marketing Specialist', icon: '📱', reason: 'Creativity and communication' },
         { title: 'Event Planner', icon: '🎉', reason: 'Energy and organization' },
-        { title: 'Journalist', icon: '📰', reason: 'Curiosity and storytelling' }
+        { title: 'Psychologist', icon: '🧠', reason: 'Understanding people' }
       ]
     },
     'ISTJ': {
-      description: 'The Logistician - Practical, fact-minded, dependable',
+      description: 'The Realist - Responsible, detail-oriented, systematic',
       careers: [
         { title: 'Accountant', icon: '💰', reason: 'Attention to detail and accuracy' },
         { title: 'Project Manager', icon: '📋', reason: 'Organization and responsibility' },
         { title: 'Librarian', icon: '📖', reason: 'Systematic and detail-oriented' }
       ]
     },
-    'ISFJ': {
-      description: 'The Defender - Dedicated, warm-hearted, protective',
-      careers: [
-        { title: 'Pharmacist', icon: '💊', reason: 'Attention to detail and care' },
-        { title: 'Social Worker', icon: '🤝', reason: 'Empathy and dedication' },
-        { title: 'Administrative Assistant', icon: '📁', reason: 'Organization and reliability' }
-      ]
-    },
     'ESTJ': {
-      description: 'The Executive - Efficient, organized, practical leader',
+      description: 'The Supervisor - Organized, decisive, practical',
       careers: [
         { title: 'Police Officer', icon: '👮', reason: 'Decisiveness and structure' },
         { title: 'Operations Manager', icon: '🏭', reason: 'Efficiency and organization' },
         { title: 'Judge', icon: '⚖️', reason: 'Decisiveness and fairness' }
       ]
     },
+    'ISFJ': {
+      description: 'The Protector - Thoughtful, loyal, caring',
+      careers: [
+        { title: 'Pharmacist', icon: '💊', reason: 'Attention to detail and care' },
+        { title: 'Social Worker', icon: '🤝', reason: 'Empathy and dedication' },
+        { title: 'Administrative Assistant', icon: '📁', reason: 'Organization and reliability' }
+      ]
+    },
     'ESFJ': {
-      description: 'The Consul - Caring, social, community-oriented',
+      description: 'The Caregiver - Devoted, helpful, community-oriented',
       careers: [
         { title: 'Teacher', icon: '📚', reason: 'Nurturing and communication' },
         { title: 'Nurse', icon: '🏥', reason: 'Caring and dedication' },
@@ -128,23 +90,15 @@ function App() {
       ]
     },
     'ISTP': {
-      description: 'The Virtuoso - Bold, practical, hands-on problem solver',
+      description: 'The Craftsman - Skilled craftsmanship, flexible, practical',
       careers: [
         { title: 'Mechanical Engineer', icon: '🔧', reason: 'Practical skills and problem-solving' },
         { title: 'Pilot', icon: '✈️', reason: 'Quick reflexes and technical skills' },
         { title: 'Forensic Analyst', icon: '🔍', reason: 'Attention to detail and analysis' }
       ]
     },
-    'ISFP': {
-      description: 'The Adventurer - Flexible, charming, artistic',
-      careers: [
-        { title: 'Artist', icon: '🎨', reason: 'Creative expression and aesthetics' },
-        { title: 'Musician', icon: '🎵', reason: 'Emotional expression through art' },
-        { title: 'Chef', icon: '🍳', reason: 'Hands-on creativity and sensory experience' }
-      ]
-    },
     'ESTP': {
-      description: 'The Entrepreneur - Energetic, perceptive, risk-taker',
+      description: 'The Doer - Action-oriented, pragmatic, risk-taker',
       careers: [
         { title: 'Real Estate Agent', icon: '🏠', reason: 'Energy and negotiation skills' },
         { title: 'Athlete', icon: '⚽', reason: 'Physical energy and competition' },
@@ -152,11 +106,11 @@ function App() {
       ]
     },
     'ESFP': {
-      description: 'The Entertainer - Spontaneous, energetic, enthusiastic',
+      description: 'The Performer - Lively, optimistic, enjoys being center of attention',
       careers: [
         { title: 'Actor', icon: '🎬', reason: 'Expression and charisma' },
         { title: 'Tour Guide', icon: '🗺️', reason: 'Energy and communication' },
-        { title: 'Event Coordinator', icon: '🎪', reason: 'Creativity and people skills' }
+        { title: 'Childcare Worker', icon: '👶', reason: 'Playfulness and care' }
       ]
     }
   };
@@ -177,7 +131,6 @@ function App() {
             console.log('Successfully loaded questions.json');
           } else {
             console.warn('questions.json not found, using fallback');
-            // Use empty array - we'll handle empty questions
           }
         } catch (e) {
           console.warn('Error loading questions.json:', e);
@@ -216,63 +169,55 @@ function App() {
 
   // Calculate MBTI score based on sum scoring (threshold = 15)
   const calculatePersonality = (answers, questions) => {
+    // Initialize group scores
     const groupScores = {
-      EI: 0,
-      SN: 0,
-      TF: 0,
-      JP: 0
+      EI: 0,  // Extroversion vs Introversion
+      SN: 0,  // Intuition vs Sensing
+      TF: 0,  // Feeling vs Thinking
+      JP: 0   // Perceiving vs Judging
     };
     
+    // Calculate total scores for each group
     answers.forEach(answer => {
       const question = questions.find(q => q.id === answer.questionId);
       if (question) {
         const group = question.group;
-        const score = answer.value;
+        const score = answer.value; // Value from 1-5
         groupScores[group] += score;
       }
     });
     
-    console.log('Group scores:', groupScores);
-    
+    // Determine traits: Score > 15 → first trait, Score ≤ 15 → second trait
     const energy = groupScores.EI > 15 ? 'E' : 'I';
     const perception = groupScores.SN > 15 ? 'N' : 'S';
     const decision = groupScores.TF > 15 ? 'F' : 'T';
     const lifestyle = groupScores.JP > 15 ? 'P' : 'J';
     const type = energy + perception + decision + lifestyle;
     
-    console.log('Result type:', type);
-    
+    // Calculate percentage strength
     const calculatePercentage = (score) => {
       const deviation = Math.abs(score - 15);
-      const maxDeviation = 10;
+      const maxDeviation = 10; // 25 - 15 = 10
       const percentage = Math.round((deviation / maxDeviation) * 100);
       return Math.min(percentage, 100);
     };
     
     const percentages = {
       EI: { 
-        E: calculatePercentage(groupScores.EI), 
-        I: 100 - calculatePercentage(groupScores.EI), 
-        dominant: energy,
-        score: groupScores.EI
+        E: groupScores.EI, I: groupScores.EI, dominant: energy, 
+        percentage: calculatePercentage(groupScores.EI) 
       },
       SN: { 
-        S: calculatePercentage(groupScores.SN), 
-        N: 100 - calculatePercentage(groupScores.SN), 
-        dominant: perception,
-        score: groupScores.SN
+        S: groupScores.SN, N: groupScores.SN, dominant: perception, 
+        percentage: calculatePercentage(groupScores.SN) 
       },
       TF: { 
-        T: calculatePercentage(groupScores.TF), 
-        F: 100 - calculatePercentage(groupScores.TF), 
-        dominant: decision,
-        score: groupScores.TF
+        T: groupScores.TF, F: groupScores.TF, dominant: decision, 
+        percentage: calculatePercentage(groupScores.TF) 
       },
       JP: { 
-        J: calculatePercentage(groupScores.JP), 
-        P: 100 - calculatePercentage(groupScores.JP), 
-        dominant: lifestyle,
-        score: groupScores.JP
+        J: groupScores.JP, P: groupScores.JP, dominant: lifestyle, 
+        percentage: calculatePercentage(groupScores.JP) 
       }
     };
     
@@ -281,19 +226,12 @@ function App() {
 
   // Calculate results when questions are completed
   useEffect(() => {
-    console.log('Checking completion:', { 
-      step, 
-      answersLength: answers.length, 
-      totalQuestions: questionsData.length 
-    });
-    
     if (step === 'questions' && answers.length === questionsData.length && questionsData.length > 0) {
-      console.log('All questions answered! Calculating results...');
       setLoading(true);
       setTimeout(() => {
         const personalityResult = calculatePersonality(answers, questionsData);
         const careerData = careersData[personalityResult.type] || {
-          description: `${personalityResult.type} - Your unique personality type`,
+          description: 'Your unique personality type',
           careers: [
             { title: 'Career Counselor', icon: '🎯', reason: 'Understanding of people' },
             { title: 'Research Specialist', icon: '🔬', reason: 'Analytical thinking' },
@@ -310,53 +248,17 @@ function App() {
     }
   }, [answers, step, questionsData, careersData]);
 
-  // Handle answer selection - AUTO GO TO NEXT QUESTION
+  // Handle answer selection (1-5 scale)
   const handleAnswer = (value) => {
     const newAnswer = {
       questionId: questionsData[currentQuestionIndex].id,
       value: value,
     };
-    
-    const newAnswers = [...answers, newAnswer];
-    setAnswers(newAnswers);
-    
-    // Auto move to next question after answering
+    setAnswers([...answers, newAnswer]);
+
     if (currentQuestionIndex + 1 < questionsData.length) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
-      setSelectedScore(null);
-      setIsAnswered(false);
-    } else {
-      // If this is the last question, mark as answered and let useEffect handle results
-      setIsAnswered(true);
-      // The useEffect will trigger when answers length equals questions length
     }
-  };
-  
-  // Handle previous question
-  const handlePrevious = () => {
-    if (currentQuestionIndex > 0) {
-      // Remove the last answer when going back
-      const newAnswers = answers.slice(0, -1);
-      setAnswers(newAnswers);
-      setCurrentQuestionIndex(currentQuestionIndex - 1);
-      setSelectedScore(null);
-      setIsAnswered(false);
-    }
-  };
-  
-  // Handle score selection for current question
-  const handleScoreSelect = (score) => {
-    if (isAnswered) return;
-    setSelectedScore(score);
-  };
-  
-  // Handle submit for current question - NOW AUTO GOES TO NEXT
-  const handleSubmit = () => {
-    if (selectedScore === null) {
-      alert('Please select a rating (1-5)');
-      return;
-    }
-    handleAnswer(selectedScore);
   };
 
   const handlePersonalInfoSubmit = (info) => {
@@ -399,8 +301,6 @@ function App() {
     setAnswers([]);
     setResult(null);
     setUserInfo({ name: '', email: '' });
-    setSelectedScore(null);
-    setIsAnswered(false);
   };
 
   if (!dataLoaded) {
@@ -414,7 +314,7 @@ function App() {
     );
   }
 
-  // ==================== PERSONAL INFO FORM ====================
+  // Personal Information Form
   if (step === 'personal') {
     return (
       <motion.div
@@ -472,30 +372,50 @@ function App() {
     );
   }
 
-  // ==================== QUESTIONS (1-5 SCALE) ====================
+  // Questions with 1-5 scale
   if (step === 'questions') {
     const currentQuestion = questionsData[currentQuestionIndex];
     const percentage = ((currentQuestionIndex + 1) / questionsData.length) * 100;
     
-    if (!currentQuestion || questionsData.length === 0) {
-      return (
-        <div className="container">
-          <div className="card" style={{ textAlign: 'center' }}>
-            <p>Loading questions...</p>
-          </div>
-        </div>
-      );
-    }
+    const scores = [
+      { value: 1, label: '1', text: 'Not at all', textEn: 'Does not describe me' },
+      { value: 2, label: '2', text: 'Slightly', textEn: 'Describes me a little' },
+      { value: 3, label: '3', text: 'Moderately', textEn: 'Describes me moderately' },
+      { value: 4, label: '4', text: 'Very much', textEn: 'Describes me well' },
+      { value: 5, label: '5', text: 'Extremely', textEn: 'Describes me very well' }
+    ];
     
-    // Check if current question already has an answer
-    const currentAnswer = answers.find(a => a.questionId === currentQuestion.id);
-    const hasAnswer = !!currentAnswer;
+    const [selectedScore, setSelectedScore] = useState(null);
+    const [isAnswered, setIsAnswered] = useState(false);
     
-    // If we're revisiting a question, show the selected score
-    const displayScore = hasAnswer ? currentAnswer.value : selectedScore;
+    const handleScoreSelect = (score) => {
+      if (isAnswered) return;
+      setSelectedScore(score);
+    };
+    
+    const handleSubmit = () => {
+      if (selectedScore === null) {
+        alert('Please select a rating (1-5)');
+        return;
+      }
+      handleAnswer(selectedScore);
+      setIsAnswered(true);
+    };
+    
+    const handleNext = () => {
+      setIsAnswered(false);
+      setSelectedScore(null);
+    };
+    
+    if (!currentQuestion) return null;
     
     return (
-      <div className="container">
+      <motion.div
+        initial={{ opacity: 0, x: 50 }}
+        animate={{ opacity: 1, x: 0 }}
+        exit={{ opacity: 0, x: -50 }}
+        className="container"
+      >
         <div className="card">
           <div className="progress-container">
             <div className="progress-bar">
@@ -510,28 +430,28 @@ function App() {
             {currentQuestion.text}
           </h2>
           <p style={{ color: 'var(--gray)', marginBottom: '1.5rem', fontStyle: 'italic' }}>
-            Rate how well this describes you (1 = Not at all, 5 = Describes me very well)
+            {currentQuestion.description}
           </p>
           
           <div style={{ marginBottom: '2rem' }}>
             <p style={{ marginBottom: '1rem', fontWeight: 'bold', textAlign: 'center' }}>
-              Rate how well this describes you:
+              Rate how well this describes you (1 = Not at all, 5 = Describes me very well):
             </p>
             <div style={{ display: 'flex', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap' }}>
               {scores.map((score) => (
                 <button
                   key={score.value}
                   onClick={() => handleScoreSelect(score.value)}
-                  disabled={hasAnswer}
+                  disabled={isAnswered}
                   style={{
                     flex: 1,
                     minWidth: '70px',
                     padding: '12px',
-                    background: displayScore === score.value ? '#667eea' : '#f9fafb',
-                    border: displayScore === score.value ? '2px solid #667eea' : '2px solid #e5e7eb',
+                    background: selectedScore === score.value ? '#667eea' : '#f9fafb',
+                    border: selectedScore === score.value ? '2px solid #667eea' : '2px solid #e5e7eb',
                     borderRadius: '12px',
-                    cursor: hasAnswer ? 'not-allowed' : 'pointer',
-                    color: displayScore === score.value ? 'white' : '#333',
+                    cursor: isAnswered ? 'not-allowed' : 'pointer',
+                    color: selectedScore === score.value ? 'white' : '#333',
                     transition: 'all 0.3s ease'
                   }}
                 >
@@ -543,25 +463,8 @@ function App() {
             </div>
           </div>
           
-          <div style={{ display: 'flex', justifyContent: 'space-between', gap: '1rem' }}>
-            <button 
-              onClick={handlePrevious}
-              disabled={currentQuestionIndex === 0}
-              style={{
-                padding: '12px 30px',
-                background: currentQuestionIndex === 0 ? '#ccc' : '#6b7280',
-                color: 'white',
-                border: 'none',
-                borderRadius: '12px',
-                cursor: currentQuestionIndex === 0 ? 'not-allowed' : 'pointer',
-                fontSize: '16px',
-                fontWeight: 'bold'
-              }}
-            >
-              ← Previous
-            </button>
-            
-            {!hasAnswer ? (
+          <div style={{ textAlign: 'center' }}>
+            {!isAnswered ? (
               <button 
                 onClick={handleSubmit}
                 disabled={selectedScore === null}
@@ -573,48 +476,35 @@ function App() {
                   borderRadius: '12px',
                   cursor: selectedScore === null ? 'not-allowed' : 'pointer',
                   fontSize: '16px',
-                  fontWeight: 'bold',
-                  flex: 1
+                  fontWeight: 'bold'
                 }}
               >
                 Confirm Answer ✓
               </button>
             ) : (
               <button 
-                onClick={() => {
-                  if (currentQuestionIndex + 1 < questionsData.length) {
-                    setCurrentQuestionIndex(currentQuestionIndex + 1);
-                    setSelectedScore(null);
-                  }
-                }}
-                disabled={currentQuestionIndex + 1 >= questionsData.length}
+                onClick={handleNext}
                 style={{
                   padding: '12px 30px',
-                  background: currentQuestionIndex + 1 >= questionsData.length ? '#ccc' : '#10b981',
+                  background: '#667eea',
                   color: 'white',
                   border: 'none',
                   borderRadius: '12px',
-                  cursor: currentQuestionIndex + 1 >= questionsData.length ? 'not-allowed' : 'pointer',
+                  cursor: 'pointer',
                   fontSize: '16px',
-                  fontWeight: 'bold',
-                  flex: 1
+                  fontWeight: 'bold'
                 }}
               >
-                {currentQuestionIndex + 1 === questionsData.length ? 'Last Question' : 'Next →'}
+                {currentQuestionIndex + 1 === questionsData.length ? 'View Results 🎉' : 'Next Question →'}
               </button>
             )}
           </div>
-          
-          {/* Show completion status */}
-          <div style={{ marginTop: '1rem', textAlign: 'center', fontSize: '0.875rem', color: 'var(--gray)' }}>
-            Completed: {answers.length} / {questionsData.length} questions
-          </div>
         </div>
-      </div>
+      </motion.div>
     );
   }
 
-  // ==================== RESULTS ====================
+  // Results Page
   if (step === 'results') {
     if (loading || !result) {
       return (
