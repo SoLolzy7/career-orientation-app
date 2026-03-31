@@ -356,7 +356,7 @@ function App() {
             🌟 Discover Your Career Path
           </h1>
           <p style={{ color: '#6b7280', marginBottom: '2rem' }}>
-            MBTI personality assessment to help you understand yourself and find suitable careers
+            English Group 9 - Operated by Hoang Tri.
           </p>
           
           <form onSubmit={(e) => {
