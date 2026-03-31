@@ -215,69 +215,82 @@ function App() {
   };
 
   // Calculate MBTI score based on sum scoring (threshold = 15)
-  const calculatePersonality = (answers, questions) => {
-    const groupScores = {
-      EI: 0,
-      SN: 0,
-      TF: 0,
-      JP: 0
-    };
-    
-    answers.forEach(answer => {
-      const question = questions.find(q => q.id === answer.questionId);
-      if (question) {
-        const group = question.group;
-        const score = answer.value;
-        groupScores[group] += score;
-      }
-    });
-    
-    console.log('Group scores:', groupScores);
-    
-    const energy = groupScores.EI > 15 ? 'E' : 'I';
-    const perception = groupScores.SN > 15 ? 'N' : 'S';
-    const decision = groupScores.TF > 15 ? 'F' : 'T';
-    const lifestyle = groupScores.JP > 15 ? 'P' : 'J';
-    const type = energy + perception + decision + lifestyle;
-    
-    console.log('Result type:', type);
-    
-    const calculatePercentage = (score) => {
-      const deviation = Math.abs(score - 15);
-      const maxDeviation = 10;
-      const percentage = Math.round((deviation / maxDeviation) * 100);
-      return Math.min(percentage, 100);
-    };
-    
-    const percentages = {
-      EI: { 
-        E: calculatePercentage(groupScores.EI), 
-        I: 100 - calculatePercentage(groupScores.EI), 
-        dominant: energy,
-        score: groupScores.EI
-      },
-      SN: { 
-        S: calculatePercentage(groupScores.SN), 
-        N: 100 - calculatePercentage(groupScores.SN), 
-        dominant: perception,
-        score: groupScores.SN
-      },
-      TF: { 
-        T: calculatePercentage(groupScores.TF), 
-        F: 100 - calculatePercentage(groupScores.TF), 
-        dominant: decision,
-        score: groupScores.TF
-      },
-      JP: { 
-        J: calculatePercentage(groupScores.JP), 
-        P: 100 - calculatePercentage(groupScores.JP), 
-        dominant: lifestyle,
-        score: groupScores.JP
-      }
-    };
-    
-    return { type, scores: groupScores, percentages };
+
+const calculatePersonality = (answers, questions) => {
+  const groupScores = {
+    EI: 0,
+    SN: 0,
+    TF: 0,
+    JP: 0
   };
+  
+  answers.forEach(answer => {
+    const question = questions.find(q => q.id === answer.questionId);
+    if (question) {
+      const group = question.group;
+      const score = answer.value;
+      groupScores[group] += score;
+    }
+  });
+  
+  console.log('Group scores:', groupScores);
+  
+  // Determine traits: Score > 15 → first trait, Score ≤ 15 → second trait
+  const energy = groupScores.EI > 15 ? 'E' : 'I';
+  const perception = groupScores.SN > 15 ? 'N' : 'S';
+  const decision = groupScores.TF > 15 ? 'F' : 'T';
+  const lifestyle = groupScores.JP > 15 ? 'P' : 'J';
+  const type = energy + perception + decision + lifestyle;
+  
+  console.log('Result type:', type);
+  
+  // Calculate percentage for EACH trait (how strong the preference is)
+  const calculatePercentage = (score) => {
+    // Score range: 5 to 25, threshold at 15
+    // If score > 15, percentage = (score - 15) / 10 * 100
+    // If score <= 15, percentage = (15 - score) / 10 * 100
+    const deviation = Math.abs(score - 15);
+    const maxDeviation = 10; // 25 - 15 = 10
+    const percentage = Math.round((deviation / maxDeviation) * 100);
+    return Math.min(percentage, 100);
+  };
+  
+  // For the dominant trait, show the percentage strength
+  // For the opposite trait, show 100 - percentage
+  const getDominantPercentage = (score, isDominant) => {
+    const pct = calculatePercentage(score);
+    return isDominant ? pct : 100 - pct;
+  };
+  
+  const percentages = {
+    EI: { 
+      E: groupScores.EI > 15 ? calculatePercentage(groupScores.EI) : 100 - calculatePercentage(groupScores.EI),
+      I: groupScores.EI <= 15 ? calculatePercentage(groupScores.EI) : 100 - calculatePercentage(groupScores.EI),
+      dominant: energy,
+      score: groupScores.EI
+    },
+    SN: { 
+      S: groupScores.SN <= 15 ? calculatePercentage(groupScores.SN) : 100 - calculatePercentage(groupScores.SN),
+      N: groupScores.SN > 15 ? calculatePercentage(groupScores.SN) : 100 - calculatePercentage(groupScores.SN),
+      dominant: perception,
+      score: groupScores.SN
+    },
+    TF: { 
+      T: groupScores.TF <= 15 ? calculatePercentage(groupScores.TF) : 100 - calculatePercentage(groupScores.TF),
+      F: groupScores.TF > 15 ? calculatePercentage(groupScores.TF) : 100 - calculatePercentage(groupScores.TF),
+      dominant: decision,
+      score: groupScores.TF
+    },
+    JP: { 
+      J: groupScores.JP <= 15 ? calculatePercentage(groupScores.JP) : 100 - calculatePercentage(groupScores.JP),
+      P: groupScores.JP > 15 ? calculatePercentage(groupScores.JP) : 100 - calculatePercentage(groupScores.JP),
+      dominant: lifestyle,
+      score: groupScores.JP
+    }
+  };
+  
+  return { type, scores: groupScores, percentages };
+};
 
   // Calculate results when questions are completed
   useEffect(() => {
