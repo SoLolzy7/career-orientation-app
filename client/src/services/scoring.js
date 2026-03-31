@@ -42,48 +42,91 @@ export function calculatePersonality(answers, questions) {
   
   const type = energy + perception + decision + lifestyle;
   
-  // Calculate percentage for each pair (based on deviation from threshold)
-  const calculatePercentage = (score, maxScore = 25) => {
-    // Max score per group: 5 questions x 5 points = 25
-    // Min score: 5 questions x 1 point = 5
-    // Threshold: 15
-    // Calculate strength percentage of dominant trait
+  // Calculate percentage strength (0-100) for the DOMINANT trait
+  const calculateStrengthPercentage = (score) => {
+    // Score range: 5 to 25, threshold at 15
+    // Max deviation from threshold = 10 (25-15 or 15-5)
     const deviation = Math.abs(score - 15);
-    const maxDeviation = 10; // 25 - 15 = 10
+    const maxDeviation = 10;
     const percentage = Math.round((deviation / maxDeviation) * 100);
     return Math.min(percentage, 100);
   };
   
+  // For each pair, calculate the percentage for BOTH traits
+  // The sum of both percentages will always be 100%
+  const getEIPercentages = (score) => {
+    const strength = calculateStrengthPercentage(score);
+    if (score > 15) {
+      return { E: strength, I: 100 - strength };
+    } else {
+      return { E: 100 - strength, I: strength };
+    }
+  };
+  
+  const getSNPercentages = (score) => {
+    const strength = calculateStrengthPercentage(score);
+    if (score > 15) {
+      return { N: strength, S: 100 - strength };
+    } else {
+      return { N: 100 - strength, S: strength };
+    }
+  };
+  
+  const getTFPercentages = (score) => {
+    const strength = calculateStrengthPercentage(score);
+    if (score > 15) {
+      return { F: strength, T: 100 - strength };
+    } else {
+      return { F: 100 - strength, T: strength };
+    }
+  };
+  
+  const getJPPercentages = (score) => {
+    const strength = calculateStrengthPercentage(score);
+    if (score > 15) {
+      return { P: strength, J: 100 - strength };
+    } else {
+      return { P: 100 - strength, J: strength };
+    }
+  };
+  
+  const eiPct = getEIPercentages(groupScores.EI);
+  const snPct = getSNPercentages(groupScores.SN);
+  const tfPct = getTFPercentages(groupScores.TF);
+  const jpPct = getJPPercentages(groupScores.JP);
+  
   const percentages = {
     EI: {
-      E: groupScores.EI,
-      I: groupScores.EI,
+      E: eiPct.E,
+      I: eiPct.I,
       dominant: energy,
-      percentage: calculatePercentage(groupScores.EI),
+      percentage: calculateStrengthPercentage(groupScores.EI),
       score: groupScores.EI
     },
     SN: {
-      S: groupScores.SN,
-      N: groupScores.SN,
+      S: snPct.S,
+      N: snPct.N,
       dominant: perception,
-      percentage: calculatePercentage(groupScores.SN),
+      percentage: calculateStrengthPercentage(groupScores.SN),
       score: groupScores.SN
     },
     TF: {
-      T: groupScores.TF,
-      F: groupScores.TF,
+      T: tfPct.T,
+      F: tfPct.F,
       dominant: decision,
-      percentage: calculatePercentage(groupScores.TF),
+      percentage: calculateStrengthPercentage(groupScores.TF),
       score: groupScores.TF
     },
     JP: {
-      J: groupScores.JP,
-      P: groupScores.JP,
+      J: jpPct.J,
+      P: jpPct.P,
       dominant: lifestyle,
-      percentage: calculatePercentage(groupScores.JP),
+      percentage: calculateStrengthPercentage(groupScores.JP),
       score: groupScores.JP
     }
   };
+  
+  console.log('Calculated percentages:', percentages);
   
   return { 
     type, 
