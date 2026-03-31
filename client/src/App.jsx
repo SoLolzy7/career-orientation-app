@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { sendResultEmail } from './services/api';
-import { calculatePersonality } from './scoring';
+import { calculatePersonality } from './services/scoring.js';
 import './index.css';
 
 function App() {
