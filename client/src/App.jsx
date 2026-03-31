@@ -225,8 +225,9 @@ function App() {
       console.log('All questions answered! Calculating results...');
       setLoading(true);
       setTimeout(() => {
-        // Use the imported calculatePersonality from scoring.js
         const personalityResult = calculatePersonality(answers, questionsData);
+        console.log('Personality result:', personalityResult);
+        
         const careerData = careersData[personalityResult.type] || {
           description: `${personalityResult.type} - Your unique personality type`,
           careers: [
@@ -236,7 +237,8 @@ function App() {
           ]
         };
         setResult({
-          ...personalityResult,
+          type: personalityResult.type,
+          percentages: personalityResult.percentages,
           careers: careerData
         });
         setStep('results');
@@ -555,38 +557,39 @@ function App() {
     }
     
     const careerList = result.careers?.careers || [];
+    const pct = result.percentages;
+    
+    // Debug log to see what we have
+    console.log('Result percentages:', pct);
+    
     const traitPairs = [
       { 
-        left: result.percentages.EI.E, 
-        right: result.percentages.EI.I, 
+        left: pct?.EI?.E || 0, 
+        right: pct?.EI?.I || 0, 
         leftName: 'Extroversion (E)', 
         rightName: 'Introversion (I)', 
-        dominant: result.percentages.EI.dominant,
-        percentage: result.percentages.EI.percentage
+        dominant: pct?.EI?.dominant || 'E'
       },
       { 
-        left: result.percentages.SN.S, 
-        right: result.percentages.SN.N, 
+        left: pct?.SN?.S || 0, 
+        right: pct?.SN?.N || 0, 
         leftName: 'Sensing (S)', 
         rightName: 'Intuition (N)', 
-        dominant: result.percentages.SN.dominant,
-        percentage: result.percentages.SN.percentage
+        dominant: pct?.SN?.dominant || 'S'
       },
       { 
-        left: result.percentages.TF.T, 
-        right: result.percentages.TF.F, 
+        left: pct?.TF?.T || 0, 
+        right: pct?.TF?.F || 0, 
         leftName: 'Thinking (T)', 
         rightName: 'Feeling (F)', 
-        dominant: result.percentages.TF.dominant,
-        percentage: result.percentages.TF.percentage
+        dominant: pct?.TF?.dominant || 'T'
       },
       { 
-        left: result.percentages.JP.J, 
-        right: result.percentages.JP.P, 
+        left: pct?.JP?.J || 0, 
+        right: pct?.JP?.P || 0, 
         leftName: 'Judging (J)', 
         rightName: 'Perceiving (P)', 
-        dominant: result.percentages.JP.dominant,
-        percentage: result.percentages.JP.percentage
+        dominant: pct?.JP?.dominant || 'J'
       }
     ];
     
