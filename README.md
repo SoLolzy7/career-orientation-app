@@ -7,7 +7,7 @@
 
 I am pleased to present the **Smart Career Orientation System** – a web platform using the MBTI (Myers-Briggs Type Indicator) methodology combined with an intelligent scoring algorithm to analyze personality traits and recommend suitable careers for users.
 
-* **Implementation Period:** 2 weeks
+* **Implementation Period:** 7 days
 * **Team Size:** 1 person
 * **Technologies Used:** React.js, Vite, JavaScript ES6+, EmailJS, Vercel
 
